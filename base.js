@@ -1,3 +1,12 @@
+-- Создание таблицы "roles" для хранения ролей пользователей
+CREATE TABLE roles (
+    role_id SERIAL PRIMARY KEY,
+    role_name VARCHAR(20) UNIQUE
+);
+
+-- Добавление ролей в таблицу "roles"
+INSERT INTO roles (role_name) VALUES ('volunteer'), ('client');
+
 -- Создание таблицы "dog_breeds" для хранения информации о породах собак
 CREATE TABLE dog_breeds (
     breed_id SERIAL PRIMARY KEY,
@@ -18,8 +27,8 @@ CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(255),
     email VARCHAR(255) UNIQUE,
-    password VARCHAR(255),
-    role VARCHAR(20),
+    password_hash VARCHAR(255),
+    role_id INT REFERENCES roles(role_id),
     availability TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -31,7 +40,6 @@ CREATE TABLE events (
     description TEXT,
     date DATE,
     location VARCHAR(255),
-    created_by INT REFERENCES users(user_id),
     volunteer_needed INT,
     volunteers_registered INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -85,5 +93,43 @@ CREATE TABLE ratings_reviews (
     client_id INT REFERENCES users(user_id),
     rating NUMERIC,
     review TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Создание таблицы "tokens" для хранения JWT токенов
+CREATE TABLE tokens (
+    token_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id),
+    token TEXT,
+    expiration_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Создание таблицы "sessions" для отслеживания сеансов аутентификации (по желанию)
+CREATE TABLE sessions (
+    session_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id),
+    session_token TEXT,
+    expiration_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Создание таблицы "password_reset_tokens" для сброса пароля (по желанию)
+CREATE TABLE password_reset_tokens (
+    token_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id),
+    reset_token TEXT,
+    expiration_date TIMESTAMP,
+    used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Создание таблицы "refresh_tokens" для обновления JWT токенов (по желанию)
+CREATE TABLE refresh_tokens (
+    token_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id),
+    refresh_token TEXT,
+    expiration_date TIMESTAMP,
+    used BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
