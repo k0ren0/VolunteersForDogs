@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from "react";
+import React, { useState, createContext } from "react";
 import Home from "./components/Home";
 import Nav from "./components/Nav";
 import Events from "./components/Events";
@@ -17,10 +17,10 @@ function App() {
 
   const updateToken = (newToken) => {
     if (newToken) {
-      Cookies.set('token', newToken, { expires: 7 }); // Устанавливаем куки на 7 дней
+      Cookies.set('token', newToken, { expires: 7 });
       setToken(newToken);
     } else {
-      Cookies.remove('token'); // Удаляем куки
+      Cookies.remove('token');
       setToken(null);
     }
   };
