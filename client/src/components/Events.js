@@ -1,41 +1,61 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const Events = () => {
-  const [isAuthorized, setIsAuthorized] = useState(false);
+function Events() {
+  const [events, setEvents] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get("http://localhost:5005/users/verify", { withCredentials: true })
-      .then(() => {
-        setIsAuthorized(true); // Пользователь аутентифицирован
-      })
-      .catch((error) => {
-        console.error("Verification failed:", error);
-        setIsAuthorized(false); // Нет перенаправления, устанавливаем статус неавторизованности
-      });
-  }, [navigate]);
+    // Проверяем, есть ли токен в localStorage
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // Если токена нет, перенаправляем на страницу входа
+      navigate("/login");
+    } else {
+      // Если токен есть, делаем запрос к серверу для получения списка событий
+      axios
+        .get("http://localhost:5005/events", {
+          headers: {
+            "x-access-token": token, // Отправляем токен через заголовок x-access-token
+          },
+        })
+        .then((response) => {
+          // Обрабатываем успешный ответ от сервера
+          console.log("Events data:", response.data);
+          setEvents(response.data); // Сохраняем полученные данные о событиях в состояние
+        })
+        .catch((error) => {
+          // Обрабатываем возможные ошибки
+          console.error("Failed to fetch events:", error);
+          // Дополнительно можно обработать разные типы ошибок
+          // Например, если ошибка 403, перенаправить на страницу входа
+          if (error.response && error.response.status === 403) {
+            navigate("/login");
+          }
+        });
+    }
+  }, [navigate]); // Зависимость от navigate для useEffect
 
-  // Сообщение для неаутентифицированных пользователей
-  if (!isAuthorized) {
-    return (
-      <div>
-        <h1>Access Denied</h1>
-        <p>Доступ к этой странице возможен только после авторизации.</p>
-        <p>Пожалуйста, <Link to="/login">войдите в свой аккаунт</Link>, чтобы получить доступ к защищенной информации.</p>
-      </div>
-    );
-  }
-
-  // Отображаем контент для аутентифицированных пользователей
   return (
     <div>
-      <h1>Information</h1>
-      <p>Это защищенная страница с информацией, доступной только после авторизации.</p>
-      <Link to="/">Вернуться на главную</Link>
+      <h1>Events</h1>
+      <ul>
+        {events.length === 0 ? (
+          <p>No events available</p>
+        ) : (
+          events.map((event) => (
+            <li key={event.event_id}>
+              <strong>{event.title}</strong>
+              <p>{event.description}</p>
+              <p>Date: {event.date}</p>
+              <p>Location: {event.location}</p>
+            </li>
+          ))
+        )}
+      </ul>
     </div>
   );
-};
+}
 
 export default Events;
