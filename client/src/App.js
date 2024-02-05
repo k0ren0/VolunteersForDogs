@@ -1,37 +1,43 @@
-import React, { useState, createContext } from "react";
+import React, { useState, createContext, useEffect } from "react";
 import Home from "./components/Home";
 import Nav from "./components/Nav";
-import Info from "./components/Info";
+import Events from "./components/Events";
 import LoginRegister from "./components/LoginRegister";
-import Users from "./components/Users"; 
-import { Routes, Route, Navigate } from "react-router-dom";
+import Profile from "./components/Profile"; 
+import { Routes, Route } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
 import Auth from "./auth/Auth";
+import Cookies from 'js-cookie';
 
 export const AuthContext = createContext();
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(Cookies.get('token') || null);
+
+  const updateToken = (newToken) => {
+    if (newToken) {
+      Cookies.set('token', newToken, { expires: 7 }); // Устанавливаем куки на 7 дней
+      setToken(newToken);
+    } else {
+      Cookies.remove('token'); // Удаляем куки
+      setToken(null);
+    }
+  };
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <AuthContext.Provider value={{ token, setToken }}>
-          <div className="App">
-            <Nav />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<LoginRegister page={"Login"} />} />
-              <Route
-                path="/register"
-                element={<LoginRegister page={"Register"} />}
-              />
-              <Route path='/info' element={<Auth><Info /></Auth>} />
-              <Route path='/users' element={<Auth><Users /></Auth>} />
-            </Routes>
-          </div>
+        <AuthContext.Provider value={{ token, setToken: updateToken }}>
+          <Nav />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<LoginRegister page={"Login"} />} />
+            <Route path="/register" element={<LoginRegister page={"Register"} />} />
+            <Route path='/events' element={<Auth><Events /></Auth>} />
+            <Route path='/profile' element={<Auth><Profile /></Auth>} />
+          </Routes>
         </AuthContext.Provider>
       </header>
     </div>

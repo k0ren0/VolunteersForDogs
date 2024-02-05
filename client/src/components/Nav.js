@@ -14,11 +14,11 @@ const Nav = () => {
         </Button>
         {token && (
           <>
-            <Button component={Link} to="/users">
-              Users
+            <Button component={Link} to="/profile">
+              Profile
             </Button>
-            <Button component={Link} to="/info">
-              Info
+            <Button component={Link} to="/events">
+              Events
             </Button>
           </>
         )}
