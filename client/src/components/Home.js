@@ -21,6 +21,7 @@ const Home = (props) => {
     return (
       <>
         <h1>Home</h1>
+        <p>We are helps you</p>
         {
             users.map(user=> {
                 return <div key={user.id}> {user.email} </div>
