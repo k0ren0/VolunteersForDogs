@@ -21,29 +21,19 @@ export const _login = async (req, res) => {
 
     const secret = process.env.ACCESS_TOKEN_SECRET;
 
-    const accesstoken = jwt.sign({ userid, useremail }, secret, {
+    const token = jwt.sign({ userid, useremail }, secret, {
       expiresIn: "90s",
     });
 
-    res.cookie("token", accesstoken, {
+    res.cookie("token", token, {
       maxAge: 90 * 1000,
       httpOnly: true,
     });
 
-    res.json({ token: accesstoken });
+    res.json({ token: token });
   } catch (error) {
     console.log("_login =>", error);
     res.status(500).json({ msg: "something went wrong!!!" });
-  }
-};
-
-export const _all = async (req, res) => {
-  try {
-    const rows = await all();
-    res.json(rows);
-  } catch (error) {
-    console.log("_all=>", error);
-    res.status(404).json({ msg: "not found" });
   }
 };
 
@@ -60,5 +50,15 @@ export const _register = async (req, res) => {
   } catch (error) {
     console.log("_register =>", error);
     res.status(500).json({ msg: "email exists" });
+  }
+};
+
+export const _all = async (req, res) => {
+  try {
+    const rows = await all();
+    res.json(rows);
+  } catch (error) {
+    console.log("_all=>", error);
+    res.status(404).json({ msg: "not found" });
   }
 };

@@ -12,5 +12,5 @@ export const login = (email) => {
 
 export const all = () => {
     // return db("users").select("id", 'email', "password").orderBy('id');
-    return db("users").select("email", "password").orderBy('id');
+    return db("users").select("email", "password").orderBy('user_id');
 };

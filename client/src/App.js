@@ -1,4 +1,4 @@
-import React, { useState, useContext, createContext } from "react";
+import React, { useState, createContext } from "react";
 import Home from "./components/Home";
 import Nav from "./components/Nav";
 import Info from "./components/Info";
@@ -7,14 +7,12 @@ import Users from "./components/Users";
 import { Routes, Route, Navigate } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
-// import PrivateRoute from "./auth/Auth";
-
-
+import Auth from "./auth/Auth";
 
 export const AuthContext = createContext();
 
 function App() {
-  const [token, setToken] = useState();
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   return (
     <div className="App">
@@ -30,14 +28,8 @@ function App() {
                 path="/register"
                 element={<LoginRegister page={"Register"} />}
               />
-              <Route
-                path="/info"
-                element={token ? <Info page={"info"} /> : <Navigate to="/login" />}
-              />
-              <Route
-                path="/users"
-                element={token ? <Users /> : <Navigate to="/login" />} // Protect the Users route
-              />
+              <Route path='/info' element={<Auth><Info /></Auth>} />
+              <Route path='/users' element={<Auth><Users /></Auth>} />
             </Routes>
           </div>
         </AuthContext.Provider>

@@ -1,37 +1,41 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import axios from "axios";
-import { AuthContext } from "./App";
+import { AuthContext } from "../App";
 import { useNavigate } from "react-router-dom";
 
-const PrivateRoute = ({ children }) => {
+const Auth = ({ children }) => {
     const { token } = useContext(AuthContext);
-    const [redirect, setRedirect] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        verify();
-    }, []);
+        const verify = async () => {
+            try {
+                const response = await axios.get("http://localhost:5005/users/verify", {
+                    headers: {
+                        "x-access-token": token, // Отправляем токен через x-access-token
+                    },
+                });
 
-    const verify = async () => {
-        try {
-            const response = await axios.get("http://localhost:3001/users/verify", {
-                headers: {
-                    "x-access-token": token?.token,
-                },
-            });
-
-            if (response.status === 200) {
-                setRedirect(true);
-            } else {
-                setRedirect(false);
+                if (response.status !== 200) {
+                    // Если статус ответа не 200, считаем пользователя неавторизованным
+                    throw new Error('Unauthorized');
+                }
+            } catch (error) {
+                console.error("Verification failed:", error);
+                if (error.response && error.response.status === 403) {
+                    // Особая обработка для статуса 403 Forbidden
+                    navigate("/login"); // Перенаправляем на страницу входа
+                } else {
+                    // Обработка других видов ошибок
+                    navigate("/login"); // В этом примере также перенаправляем на страницу входа для упрощения
+                }
             }
-        } catch (error) {
-            console.error("Fault of verification:", error);
-            setRedirect(false);
-        }
-    };
+        };
 
-    return redirect ? children : <>not authorized</>;
+        verify();
+    }, [navigate, token]); // Добавляем navigate и token в массив зависимостей
+
+    return children; // Рендерим дочерние компоненты, если верификация прошла успешно
 };
 
-export default PrivateRoute;
+export default Auth;

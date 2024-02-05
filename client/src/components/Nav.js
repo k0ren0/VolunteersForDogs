@@ -12,10 +12,15 @@ const Nav = () => {
         <Button component={Link} to="/">
           Home
         </Button>
-        {token && ( // Show the "Users" button only when the user is authenticated
-          <Button component={Link} to="/users">
-            Users
-          </Button>
+        {token && (
+          <>
+            <Button component={Link} to="/users">
+              Users
+            </Button>
+            <Button component={Link} to="/info">
+              Info
+            </Button>
+          </>
         )}
         <Button component={Link} to="/login">
           Login
