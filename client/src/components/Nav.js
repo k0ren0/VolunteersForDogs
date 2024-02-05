@@ -14,7 +14,7 @@ const Nav = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    if (isMobile) setDrawerOpen(false); // Закрываем Drawer при выходе на мобильных устройствах
+    if (isMobile) setDrawerOpen(false); // Close Drawer on mobile devices after logging out
   };
 
   const toggleDrawer = (open) => (event) => {
@@ -24,12 +24,13 @@ const Nav = () => {
     setDrawerOpen(open);
   };
 
+  // Using !!token to convert token to a boolean value
   const links = [
     { title: "Home", path: "/", hidden: false },
-    { title: "Login", path: "/login", hidden: token },
-    { title: "Register", path: "/register", hidden: token },
-    { title: "Profile", path: "/profile", hidden: !token },
-    { title: "Events", path: "/events", hidden: !token },
+    { title: "Login", path: "/login", hidden: !!token }, // Hide if token exists
+    { title: "Register", path: "/register", hidden: !!token }, // Hide if token exists
+    { title: "Profile", path: "/profile", hidden: !token }, // Show if token exists
+    { title: "Events", path: "/events", hidden: !token }, // Show if token exists
   ];
 
   const drawerList = () => (
@@ -66,9 +67,9 @@ const Nav = () => {
             <IconButton
               color="inherit"
               aria-label="open drawer"
-              edge="end" // Изменено на "end", чтобы кнопка была справа
+              edge="end"
               onClick={toggleDrawer(true)}
-              sx={{ ml: 'auto' }} // Используем `ml: 'auto'`, чтобы отодвинуть иконку к правому краю
+              sx={{ ml: 'auto' }}
             >
               <MenuIcon />
             </IconButton>
@@ -87,7 +88,7 @@ const Nav = () => {
         </Toolbar>
       </AppBar>
       <Drawer
-        anchor="right" // Изменено на "right" для отображения Drawer с правой стороны
+        anchor="right"
         open={drawerOpen}
         onClose={toggleDrawer(false)}
       >
