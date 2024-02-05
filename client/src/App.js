@@ -1,46 +1,40 @@
-import React, { useState, createContext, useEffect } from "react";
-import Home from "./components/Home";
-import Nav from "./components/Nav";
-import Events from "./components/Events";
-import LoginRegister from "./components/LoginRegister";
-import Profile from "./components/Profile"; 
-import { Routes, Route } from "react-router-dom";
-import logo from "./logo.svg";
-import "./App.css";
-import Auth from "./auth/Auth";
-import Cookies from 'js-cookie';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Home from './components/Home';
+import LoginRegister from './components/LoginRegister';
+import Nav from './components/Nav';
+import { useSelector } from 'react-redux';
+import Profile from "./components/Profile";
+import Events from './components/Events';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 
-export const AuthContext = createContext();
+// Создайте кастомную тему здесь (это опционально)
+const theme = createTheme({
+  // Вы можете настроить тему по вашему усмотрению
+});
 
 function App() {
-  const [token, setToken] = useState(Cookies.get('token') || null);
-
-  const updateToken = (newToken) => {
-    if (newToken) {
-      Cookies.set('token', newToken, { expires: 7 }); // Устанавливаем куки на 7 дней
-      setToken(newToken);
-    } else {
-      Cookies.remove('token'); // Удаляем куки
-      setToken(null);
-    }
-  };
+  const { token } = useSelector((state) => state.auth);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <AuthContext.Provider value={{ token, setToken: updateToken }}>
-          <Nav />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<LoginRegister page={"Login"} />} />
-            <Route path="/register" element={<LoginRegister page={"Register"} />} />
-            <Route path='/events' element={<Auth><Events /></Auth>} />
-            <Route path='/profile' element={<Auth><Profile /></Auth>} />
-          </Routes>
-        </AuthContext.Provider>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Nav />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginRegister page="Login" />} />
+        <Route path="/register" element={<LoginRegister page="Register" />} />
+        {token ? (
+          <>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/events" element={<Events />} />
+          </>
+        ) : (
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        )}
+      </Routes>
+    </ThemeProvider>
   );
 }
 
