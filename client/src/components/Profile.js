@@ -40,19 +40,36 @@ const Profile = () => {
     }
   }, [user]);
 
-  const handleUpdateProfile = () => {
-    if (user && user.user_id) {
-      dispatch(
-        updateUserProfile({
-          userId: user.user_id,
-          userData: { email, username, firstName, lastName, dateOfBirth },
-        })
-      );
-    } else {
-      console.error("User ID is undefined");
-    }
-  };
+  // const handleUpdateProfile = () => {
+  //   if (user && user.user_id) {
+  //     dispatch(
+  //       updateUserProfile({
+  //         userId: user.user_id,
+  //         userData: { email, username, firstName, lastName, dateOfBirth },
+  //       })
+  //     );
+  //   } else {
+  //     console.error("User ID is undefined");
+  //   }
+  // };
 
+  const handleUpdateProfile = () => {
+    if (!user || !user.user_id) {
+      console.error("User or User ID is undefined");
+      // Вы можете также установить сообщение об ошибке в состояние, чтобы отобразить его пользователю
+      setModalMessage("User information is not complete.");
+      setIsModalOpen(true);
+      return;
+    }
+  
+    dispatch(
+      updateUserProfile({
+        userId: user.user_id,
+        userData: { email, username, firstName, lastName, dateOfBirth },
+      })
+    );
+  };
+  
   const closeModal = () => {
     setIsModalOpen(false);
     setModalMessage("");

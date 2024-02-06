@@ -1,16 +1,14 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
-// Инициализируем переменные окружения из файла .env
 dotenv.config();
 
 export const verifytoken = (req, res, next) => {
     let token = req.cookies.token || req.headers["authorization"];
     console.log("token", token);
 
-    // Обработка префикса 'Bearer'
+    // Update prefix 'Bearer'
     if (token && token.startsWith('Bearer ')) {
-        // Удаление префикса 'Bearer ' для извлечения токена
+        // del prefix 'Bearer ' token
         token = token.slice(7, token.length);
     }
 
@@ -22,8 +20,8 @@ export const verifytoken = (req, res, next) => {
         if (err) {
             return res.status(403).json({ error: err.message, msg: "Forbidden: Token is not valid" });
         }
-        req.user = decoded; // Сохранение расшифрованной информации токена в объект запроса
-        next(); // Передача управления следующему middleware или обработчику
+        req.user = decoded; // Save info about token
+        next(); // Translate to next middleware 
     });
 };
 

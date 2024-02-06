@@ -1,4 +1,4 @@
-import { db } from "../config/db.js"; // Убедитесь, что путь к файлу конфигурации базы данных верный
+import { db } from "../config/db.js"; 
 
 export const register = (email, password) => {
     return db("users").insert({ email, password });

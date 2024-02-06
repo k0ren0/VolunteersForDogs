@@ -1,7 +1,7 @@
 // src/controllers/dogs.controller.js
 import { addDog, getDogsByUserId, updateDog, deleteDog } from "../models/dogs.model.js";
 
-export const _allDogs = async (req, res) => {
+export const _getDogsByUserId = async (req, res) => {
   try {
     const rows = await getDogsByUserId(req.user.user_id);
     res.json(rows);
