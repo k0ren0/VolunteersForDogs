@@ -1,45 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { authenticateUser } from '../features/auth/authSlice';
 import { Box, TextField, Button } from '@mui/material';
+import { updateUserProfile, fetchDogs } from '../features/users/usersSlice';
 import CustomModal from './CustomModal';
 
-const LoginRegister = ({ page }) => {
+const Profile = () => {
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth);
+  const { users, dogs, status, error } = useSelector((state) => state.users);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { error, token } = useSelector((state) => state.auth); // Получаем токен из состояния
 
-  const loginregister = async () => {
-    try {
-      const response = await dispatch(authenticateUser({ email, password, url: page.toLowerCase() })).unwrap();
-      navigate('/');
-    } catch (error) {
-      let errorMessage = '';
-
-      if (page === 'Login') {
-        if (error?.message === 'email not found') {
-          errorMessage = 'This email is not registered. Please sign up.';
-        } else if (error?.message === 'incorrect password') {
-          errorMessage = 'The password you entered is incorrect. Please try again.';
-        } else {
-          errorMessage = 'Error during login.';
-        }
-      } else if (page === 'Register') {
-        if (error?.message === 'email already in use') {
-          errorMessage = 'This email is already in use. Please use a different email.';
-        } else {
-          errorMessage = 'Error during registration.';
-        }
-      }
-
-      setModalMessage(errorMessage);
-      setIsModalOpen(true);
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchDogs());
     }
+  }, [dispatch, token]);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      setEmail(users[0].email);
+      setUsername(users[0].username);
+    }
+  }, [users]);
+
+  const handleUpdateProfile = () => {
+    const userId = users[0].id;
+    dispatch(updateUserProfile({ userId, userData: { email, username } }));
   };
 
   const closeModal = () => {
@@ -47,42 +36,37 @@ const LoginRegister = ({ page }) => {
     setModalMessage('');
   };
 
-  // Проверяем наличие токена и решаем, куда перенаправить пользователя
-  if (token) {
-    // Если есть токен, перенаправляем на "Profile" или "Events" (в зависимости от page)
-    navigate(page === 'Login' ? '/profile' : '/events');
-    return null; // Рендер не требуется, так как происходит перенаправление
-  }
-
   return (
     <div>
-      <h1>{page}</h1>
-      <Box component="form" sx={{ m: 1 }} noValidate autoComplete="off">
-        <TextField
-          sx={{ m: 1 }}
-          id="email"
-          type="email"
-          label="Enter your email"
-          variant="outlined"
+      <h1>User Profile</h1>
+      <div>
+        <input
+          type="text"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
         />
-        <TextField
-          sx={{ m: 1 }}
-          id="password"
-          type="password"
-          label="Enter your password"
-          variant="outlined"
-          onChange={(e) => setPassword(e.target.value)}
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
         />
-        <Button variant="contained" onClick={loginregister}>
-          {page}
-        </Button>
-      </Box>
-
+        <button onClick={handleUpdateProfile}>Update Profile</button>
+      </div>
+      <h2>My Dogs</h2>
+      {dogs.map((dog) => (
+        <div key={dog.id}>
+          <p>{dog.name}</p>
+          <p>{dog.breed}</p>
+          <p>{dog.age} years old</p>
+        </div>
+      ))}
+      {status === 'loading' && <div>Loading...</div>}
+      {error && <div>Error: {error}</div>}
       <CustomModal isOpen={isModalOpen} message={modalMessage} onRequestClose={closeModal} />
     </div>
   );
 };
 
-export default LoginRegister;
-
+export default Profile;

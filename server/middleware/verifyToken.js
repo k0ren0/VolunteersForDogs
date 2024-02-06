@@ -15,7 +15,7 @@ export const verifytoken = (req, res, next) => {
   });
 };
 
-
+export default verifytoken;
 
 // import jwt from "jsonwebtoken";
 // import dotenv from "dotenv";
