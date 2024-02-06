@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 axios.defaults.withCredentials = true;
 
 const Auth = ({ children }) => {
-    const { token, setToken } = useContext(AuthContext); // Используем setToken вместо setAuthStatus
+    const { token, setToken } = useContext(AuthContext);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,7 +19,7 @@ const Auth = ({ children }) => {
             try {
                 await axios.get("http://localhost:5005/users/verify", {
                     headers: {
-                        "x-access-token": token,
+                        "authorization": `Bearer ${token}`,
                     },
                 });
                 // Предполагаем, что успешный ответ означает, что токен валиден
@@ -37,9 +37,9 @@ const Auth = ({ children }) => {
         };
 
         verify();
-    }, [navigate, token, setToken]); // Обновляем зависимости useEffect
+    }, [navigate, token, setToken]);
 
-    return children; // Рендерим дочерние компоненты, если верификация прошла успешно
+    return children;
 };
 
 export default Auth;
