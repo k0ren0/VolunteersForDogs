@@ -2,6 +2,7 @@ import express from "express";
 import { _login, _register, _all } from "../controllers/users.controller.js";
 import { verifytoken } from "../middleware/verifyToken.js";
 
+
 const router = express.Router();
 
 router.post('/register', _register);

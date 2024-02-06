@@ -1,34 +1,29 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
 
-const Home = (props) => {
-        const[users, setUsers] = useState([]);
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers } from '../features/users/usersSlice';
 
-    
-    useEffect(() => {
-        getusers()
-    },[])
+const Home = () => {
+  const dispatch = useDispatch();
+  const { users, status, error } = useSelector((state) => state.users);
 
-    const getusers = async() => {
-        try {
-            const response = await axios.get("http://localhost:5005/users/");
-            if(response === 200) setUsers(response.data);
-        } catch (error) {
-            
-        }
-    }
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
-    return (
-      <>
-        <h1>Home</h1>
-        <p>We are helps you</p>
-        {
-            users.map(user=> {
-                return <div key={user.id}> {user.email} </div>
+  if (status === 'loading') return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
-            })
-        }
-      </>
-    );
-  };
-  export default Home;
+  return (
+    <div>
+      <h1>Home Page</h1>
+      <ul>
+        {users.map(user => (
+          <li key={user.user_id}>{user.email}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default Home;
