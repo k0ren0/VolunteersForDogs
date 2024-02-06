@@ -1,13 +1,50 @@
-import { db } from "../config/db.js";
+import * as EventsModel from '../models/events.model.js';
 
-// Контроллер для получения списка событий
-export const getEvents = async (req, res) => {
-  try {
-    // Выполняем запрос к базе данных для получения списка событий
-    const events = await db("events").select("*");
-    res.json(events);
-  } catch (error) {
-    console.error("Failed to fetch events:", error);
-    res.status(500).json({ error: "Failed to fetch events" });
-  }
+export const createEvent = async (req, res) => {
+    try {
+        const newEvent = await EventsModel.createEvent(req.body);
+        res.status(201).json(newEvent);
+    } catch (error) {
+        res.status(500).json({ message: "Error creating event", error });
+    }
+};
+
+export const getAllEvents = async (req, res) => {
+    try {
+        const events = await EventsModel.getAllEvents();
+        res.json(events);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching events", error });
+    }
+};
+
+export const getEventById = async (req, res) => {
+    try {
+        const event = await EventsModel.getEventById(req.params.id);
+        if (event) {
+            res.json(event);
+        } else {
+            res.status(404).json({ message: "Event not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching event", error });
+    }
+};
+
+export const updateEvent = async (req, res) => {
+    try {
+        const updatedEvent = await EventsModel.updateEvent(req.params.id, req.body);
+        res.json(updatedEvent);
+    } catch (error) {
+        res.status(500).json({ message: "Error updating event", error });
+    }
+};
+
+export const deleteEvent = async (req, res) => {
+    try {
+        await EventsModel.deleteEvent(req.params.id);
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting event", error });
+    }
 };

@@ -62,3 +62,15 @@ export const _all = async (req, res) => {
     res.status(404).json({ msg: "not found" });
   }
 };
+
+export const _updateUserProfile = async (req, res) => {
+  const user_id = req.params.id; // или используйте ID из req.user, если вы его там сохраняете после верификации токена
+  const userData = req.body;
+
+  try {
+      await updateUser(user_id, userData);
+      res.json({ message: "User profile updated successfully" });
+  } catch (error) {
+      res.status(500).json({ message: "Error updating user profile", error });
+  }
+};
