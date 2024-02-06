@@ -26,6 +26,6 @@ app.get("/get-db-config", (req, res) => {
 app.use("/users", usersRouter);
 app.use("/events", eventsRouter);
 
-app.listen(process.env.REACT_APP_SERVER_PORT|| 3001, () => {
-  console.log(`I'm running on ${process.env.REACT_APP_SERVER_PORT || 3001}`);
+app.listen(process.env.SERVER_PORT|| 3001, () => {
+  console.log(`I'm running on ${process.env.SERVER_PORT || 3001}`);
 });
