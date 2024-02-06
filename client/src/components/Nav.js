@@ -30,19 +30,21 @@ const Nav = () => {
 
   const checkTokenValidity = async () => {
     try {
-      const response = await fetch('/api/verifytoken', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      });
+      if (token) {
+        const response = await fetch('http://localhost:5005/api/verifytoken', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Передача токена в заголовке
+          },
+        });
 
-      if (response.status === 200) {
-        // Если токен действителен, оставляем пользователя на текущей странице
-      } else if (response.status === 401) {
-        // Если токен не действителен, перенаправляем пользователя на страницу /login
-        navigate('/login');
+        if (response.status === 200) {
+          // Если токен действителен, оставляем пользователя на текущей странице
+        } else if (response.status === 401) {
+          // Если токен не действителен, перенаправляем пользователя на страницу /login
+          navigate('/login');
+        }
       }
     } catch (error) {
       console.error('Error checking token validity:', error);
@@ -50,17 +52,15 @@ const Nav = () => {
   };
 
   useEffect(() => {
-    if (token) {
-      checkTokenValidity();
-    }
-  }, [token]);
+    checkTokenValidity();
+  }, [token, navigate]);
 
   const links = [
     { title: "Home", path: "/", hidden: false },
     { title: "Login", path: "/login", hidden: !!token },
     { title: "Register", path: "/register", hidden: !!token },
-    { title: "Profile", path: "/profile", hidden: !token },
-    { title: "Events", path: "/events", hidden: !token },
+    { title: "Profile", path: "/profile", hidden: !token }, //!
+    { title: "Events", path: "/events", hidden: !token }, //!
   ];
 
   const handleMenuItemClick = (path) => {

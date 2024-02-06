@@ -26,12 +26,18 @@ const Auth = ({ children }) => {
                 // Нет необходимости обновлять токен через setToken, если он валиден
             } catch (error) {
                 console.error("Verification failed:", error);
-                if (error.response && error.response.status === 403) {
-                    // При ошибке 403 (например, токен недействителен) мы могли бы очистить токен
-                    setToken(null); // Удаляем токен из контекста, что подразумевает необходимость повторного входа
-                    navigate("/login");
+                if (error.response) {
+                    if (error.response.status === 403) {
+                        // При ошибке 403 (например, токен недействителен) мы могли бы очистить токен
+                        setToken(null); // Удаляем токен из контекста, что подразумевает необходимость повторного входа
+                        navigate("/login");
+                    } else {
+                        // Обработка других ошибок, например, показ сообщения об ошибке или логирование
+                        console.error("Other error:", error.response.data);
+                    }
                 } else {
-                    // Обработка других ошибок, например, показ сообщения об ошибке или логирование
+                    // Обработка других ошибок, которые не связаны с ответом сервера
+                    console.error("Network error or server is not responding:", error);
                 }
             }
         };
