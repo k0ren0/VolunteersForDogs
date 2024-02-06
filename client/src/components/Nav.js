@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import { AppBar, Toolbar, IconButton, Button, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Box, useTheme, useMediaQuery } from '@mui/material';
@@ -11,10 +11,12 @@ const Nav = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     dispatch(logout());
-    if (isMobile) setDrawerOpen(false); // Close Drawer on mobile devices after logging out
+    if (isMobile) setDrawerOpen(false);
   };
 
   const toggleDrawer = (open) => (event) => {
@@ -24,14 +26,50 @@ const Nav = () => {
     setDrawerOpen(open);
   };
 
-  // Using !!token to convert token to a boolean value
+  const currentPage = location.pathname; // Текущая страница из маршрута
+
+  const checkTokenValidity = async () => {
+    try {
+      const response = await fetch('/api/verifytoken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      if (response.status === 200) {
+        // Если токен действителен, оставляем пользователя на текущей странице
+      } else if (response.status === 401) {
+        // Если токен не действителен, перенаправляем пользователя на страницу /login
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Error checking token validity:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      checkTokenValidity();
+    }
+  }, [token]);
+
   const links = [
     { title: "Home", path: "/", hidden: false },
-    { title: "Login", path: "/login", hidden: !!token }, // Hide if token exists
-    { title: "Register", path: "/register", hidden: !!token }, // Hide if token exists
-    { title: "Profile", path: "/profile", hidden: !token }, // Show if token exists
-    { title: "Events", path: "/events", hidden: !token }, // Show if token exists
+    { title: "Login", path: "/login", hidden: !!token },
+    { title: "Register", path: "/register", hidden: !!token },
+    { title: "Profile", path: "/profile", hidden: !token },
+    { title: "Events", path: "/events", hidden: !token },
   ];
+
+  const handleMenuItemClick = (path) => {
+    if (currentPage === path) {
+      // Если текущая страница совпадает с маршрутом элемента меню, ничего не делать
+      return;
+    }
+    navigate(path);
+  };
 
   const drawerList = () => (
     <Box
@@ -43,7 +81,7 @@ const Nav = () => {
       <List>
         {links.map((link, index) => !link.hidden && (
           <ListItem key={index} disablePadding>
-            <ListItemButton component={RouterLink} to={link.path}>
+            <ListItemButton onClick={() => handleMenuItemClick(link.path)}>
               <ListItemText primary={link.title} />
             </ListItemButton>
           </ListItem>
@@ -78,7 +116,12 @@ const Nav = () => {
             App Name
           </Typography>
           {!isMobile && links.map((link) => !link.hidden && (
-            <Button key={link.title} color="inherit" component={RouterLink} to={link.path} sx={{ ml: 'auto' }}>
+            <Button
+              key={link.title}
+              color="inherit"
+              onClick={() => handleMenuItemClick(link.path)}
+              sx={{ ml: 'auto' }}
+            >
               {link.title}
             </Button>
           ))}
