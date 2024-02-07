@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Добавлен Link
 import { fetchEvents, createEvent, updateEvent, deleteEvent } from '../features/events/eventsSlice';
 import { TextField, Button, Select, MenuItem, FormControl, InputLabel, Typography, CircularProgress, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { fetchUsers } from '../features/users/usersSlice';
@@ -187,7 +187,11 @@ function Events() {
                                     <TableCell>{event.date}</TableCell>
                                     <TableCell>{event.location}</TableCell>
                                     <TableCell>{event.volunteer_needed}</TableCell>
-                                    <TableCell>{event.creator && event.creator.name}</TableCell>
+                                    <TableCell>
+                                        {event.creator && (
+                                            <Link to={`/profile/${event.creator.id}`}>{event.creator.name}</Link> // Используем Link
+                                        )}
+                                    </TableCell>
                                     <TableCell>{event.dogBreed}</TableCell>
                                     <TableCell>
                                         {/* Добавляем кнопки редактирования и удаления */}
@@ -207,6 +211,7 @@ function Events() {
 }
 
 export default Events;
+
 
 
 // import React, { useEffect, useState } from 'react';
