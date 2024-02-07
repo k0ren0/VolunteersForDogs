@@ -64,7 +64,16 @@ const initialState = {
 const eventsSlice = createSlice({
     name: 'events',
     initialState,
-    reducers: {},
+    reducers: {
+        eventUpdated(state, action) {
+            const { id, title, description } = action.payload;
+            const existingEvent = state.events.find(event => event.id === id);
+            if (existingEvent) {
+                existingEvent.title = title;
+                existingEvent.description = description;
+            }
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchEvents.pending, (state) => {
@@ -93,24 +102,31 @@ const eventsSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(updateEvent.fulfilled, (state, action) => {
-                // Обновите состояние в соответствии с успешным завершением действия updateEvent
+                state.status = 'succeeded';
+                state.events.push(action.payload);
             })
             .addCase(updateEvent.rejected, (state, action) => {
-                // Обработайте ситуацию, если действие updateEvent завершилось с ошибкой
+                state.status = 'failed';
+                state.error = action.error.message;
             })
             .addCase(deleteEvent.pending, (state) => {
                 state.status = 'loading';
             })
             .addCase(deleteEvent.fulfilled, (state, action) => {
-                // Обновите состояние в соответствии с успешным завершением действия deleteEvent
+                state.status = 'succeeded';
+                state.events = state.events.filter(event => event.id !== action.payload);
             })
             .addCase(deleteEvent.rejected, (state, action) => {
-                // Обработайте ситуацию, если действие deleteEvent завершилось с ошибкой
+                state.status = 'failed';
+                state.error = action.error.message;
             });
     },
 });
 
+export const { eventUpdated } = eventsSlice.actions;
+
 export default eventsSlice.reducer;
+
 
 
 
