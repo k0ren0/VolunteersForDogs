@@ -60,7 +60,7 @@ export const addDog = createAsyncThunk('users/addDog', async (dogData, { getStat
     }
 });
 
-
+// Получение списка собак
 export const fetchDogs = createAsyncThunk('users/fetchDogs', async (_, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     if (!token) return rejectWithValue('Token not found');
@@ -112,3 +112,4 @@ const usersSlice = createSlice({
 });
 
 export default usersSlice.reducer;
+

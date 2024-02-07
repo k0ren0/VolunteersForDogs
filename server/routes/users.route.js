@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/register', _register);
 router.post('/login', _login);
 router.get('/', verifytoken, _all);
-router.get('/:id', verifytoken, _getUserById); // Добавленный маршрут для получения пользователя
+router.get('/:id', verifytoken, _getUserById); 
 router.put('/profile/:id', verifytoken, _updateUserProfile);
 
 router.get("/verify", verifytoken, (req, res) => {
