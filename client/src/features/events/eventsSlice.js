@@ -17,17 +17,18 @@ export const fetchEvents = createAsyncThunk('events/fetchEvents', async (_, { ge
 });
 
 export const createEvent = createAsyncThunk('events/createEvent', async (eventData, { getState, rejectWithValue }) => {
-    const { auth: { token } } = getState();
-    if (!token) return rejectWithValue('Token not found');
-    try {
-        const response = await axios.post('http://localhost:5005/events', eventData, {
-            headers: { 'Authorization': `Bearer ${token}` },
-        });
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(error.toString());
-    }
+  const { auth: { token, user } } = getState();
+  if (!token) return rejectWithValue('Token not found');
+  try {
+      const response = await axios.post('http://localhost:5005/events', { ...eventData, userId: user.id }, {
+          headers: { 'Authorization': `Bearer ${token}` },
+      });
+      return response.data;
+  } catch (error) {
+      return rejectWithValue(error.toString());
+  }
 });
+
 
 export const updateEvent = createAsyncThunk('events/updateEvent', async ({ eventId, eventData }, { getState, rejectWithValue }) => {
     const { auth: { token } } = getState();
