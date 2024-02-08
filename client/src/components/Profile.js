@@ -45,8 +45,8 @@ function Profile() {
   const handleUpdateProfile = () => {
     if (!user || !user.user_id) {
       console.error('User or User ID is undefined');
-      dispatch({ type: 'SET_MODAL_MESSAGE', payload: 'User information is not complete.' });
-      dispatch({ type: 'SET_IS_MODAL_OPEN', payload: true });
+      setModalMessage('User information is not complete.');
+      setIsModalOpen(true);
       return;
     }
   

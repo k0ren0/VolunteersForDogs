@@ -51,13 +51,13 @@ const LoginRegister = ({ page }) => {
     setModalMessage('');
   };
 
-  useEffect(() => {
-    if (token) {
-      if (page === 'Login' || page === 'Register') {
-        navigate('/profile'); // Redirect to the profile page after login or registration
-      }
-    }
-  }, [token, navigate, page]);
+  // useEffect(() => {
+  //   if (token) {
+  //     if (page === 'Login' || page === 'Register') {
+  //       navigate('/profile'); // Redirect to the profile page after login or registration
+  //     }
+  //   }
+  // }, [token, navigate, page]);
 
   return (
     <div>
