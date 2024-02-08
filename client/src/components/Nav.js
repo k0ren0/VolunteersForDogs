@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
@@ -26,27 +27,26 @@ const Nav = () => {
     setDrawerOpen(open);
   };
 
-  const currentPage = location.pathname; // Текущая страница из маршрута
+  const currentPage = location.pathname; // Current page from route
 
   useEffect(() => {
     checkTokenValidity();
-  }, [token, navigate]);
+  }, [token]);
 
   const checkTokenValidity = async () => {
     try {
       if (token) {
-        const response = await fetch('http://localhost:5005/api/verifytoken', {
-          method: 'POST',
+        const response = await axios.post(`${process.env.BASE_URL}/api/verifytoken`, null, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Передача токена в заголовке
+            'Authorization': `Bearer ${token}`, // Passing token in header
           },
         });
 
         if (response.status === 200) {
-          // Если токен действителен, оставляем пользователя на текущей странице
+          // If token is valid, keep the user on the current page
         } else if (response.status === 401) {
-          // Если токен не действителен, перенаправляем пользователя на страницу /login
+          // If token is invalid, redirect the user to the /login page
           navigate('/login');
         }
       }
@@ -65,7 +65,7 @@ const Nav = () => {
 
   const handleMenuItemClick = (path) => {
     if (currentPage === path) {
-      // Если текущая страница совпадает с маршрутом элемента меню, ничего не делать
+      // If current page matches menu item route, do nothing
       return;
     }
     navigate(path);
@@ -79,8 +79,8 @@ const Nav = () => {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        {links.map((link, index) => !link.hidden && (
-          <ListItem key={index} disablePadding>
+        {links.map((link) => !link.hidden && (
+          <ListItem key={link.title} disablePadding>
             <ListItemButton component={RouterLink} to={link.path}>
               <ListItemText primary={link.title} />
             </ListItemButton>
@@ -143,7 +143,6 @@ const Nav = () => {
 };
 
 export default Nav;
-
 
 
 // import React, { useState, useEffect } from 'react';

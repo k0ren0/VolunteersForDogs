@@ -74,17 +74,44 @@ export const fetchDogs = createAsyncThunk('users/fetchDogs', async (_, { getStat
     }
 });
 
+export const fetchEvents = createAsyncThunk('users/fetchEvents', async (_, { getState, rejectWithValue }) => {
+    const token = getToken(getState);
+    if (!token) return rejectWithValue('Token not found');
+    try {
+        const response = await axiosInstance.get('/events', {
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (err) {
+        return rejectWithValue(err.response.data);
+    }
+});
+
 const usersSlice = createSlice({
     name: 'users',
     initialState: {
         users: [],
         dogs: [],
+        events: [], // Добавляем новое поле для списка событий
         status: 'idle',
         error: null,
     },
     reducers: {},
     extraReducers: (builder) => {
         builder
+            // Добавляем обработчики для нового действия fetchEvents
+            .addCase(fetchEvents.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchEvents.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.events = action.payload; // Обновляем список событий
+            })
+            .addCase(fetchEvents.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
+            // Добавляем обработчики для уже существующих действий
             .addCase(fetchUsers.pending, (state) => {
                 state.status = 'loading';
             })
@@ -98,7 +125,6 @@ const usersSlice = createSlice({
             })
             .addCase(updateUserProfile.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                // Обновление профиля пользователя в state.users
                 const index = state.users.findIndex(user => user.id === action.payload.id);
                 if (index !== -1) state.users[index] = action.payload;
             })
@@ -112,4 +138,3 @@ const usersSlice = createSlice({
 });
 
 export default usersSlice.reducer;
-
