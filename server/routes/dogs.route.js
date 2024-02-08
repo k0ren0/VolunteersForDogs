@@ -1,7 +1,7 @@
 // routes/dogs.route.js
 import express from "express";
 import { _addDog, _getDogsByUserId, _updateDog, _deleteDog } from "../controllers/dogs.controller.js";
-import { verifytoken } from "../middleware/verifyToken.js";
+import { verifytoken } from "../middleware/verifytoken.js";
 
 const router = express.Router();
 
