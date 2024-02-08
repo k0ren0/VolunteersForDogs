@@ -5,7 +5,7 @@ import usersRouter from "./routes/users.route.js";
 import eventsRouter from "./routes/events.route.js";
 import dogsRouter from "./routes/dogs.route.js";
 import cookieParser from "cookie-parser";
-import { db } from "./config/db.js";
+// import { db } from "./config/db.js";
 import { verifytoken } from "./middleware/verifyToken.js"; 
 
 dotenv.config();

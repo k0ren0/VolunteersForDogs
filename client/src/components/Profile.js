@@ -74,18 +74,23 @@ function Profile() {
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                             <TextField label="Email" variant="outlined" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <Button variant="contained" color="primary" onClick={handleUpdateProfile} sx={{ mt: 2 }}>Save</Button>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField label="Username" variant="outlined" fullWidth value={username} onChange={(e) => setUsername(e.target.value)} />
+                            <Button variant="contained" color="primary" onClick={handleUpdateProfile} sx={{ mt: 2 }}>Save</Button>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField label="First Name" variant="outlined" fullWidth value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                            <Button variant="contained" color="primary" onClick={handleUpdateProfile} sx={{ mt: 2 }}>Save</Button>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField label="Last Name" variant="outlined" fullWidth value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                            <Button variant="contained" color="primary" onClick={handleUpdateProfile} sx={{ mt: 2 }}>Save</Button>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField label="Date of Birth" variant="outlined" fullWidth type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
+                            <Button variant="contained" color="primary" onClick={handleUpdateProfile} sx={{ mt: 2 }}>Save</Button>
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="h6" gutterBottom>Current Info</Typography>
@@ -130,8 +135,6 @@ function Profile() {
                     </Grid>
                 )}
 
-                <Button variant="contained" color="primary" onClick={handleUpdateProfile} sx={{ mt: 2 }}>Update Profile</Button>
-
                 {status === "loading" && <CircularProgress />}
                 {error && <Typography color="error">Error: {error}</Typography>}
 
@@ -142,6 +145,7 @@ function Profile() {
 }
 
 export default Profile;
+
 
 
 // import React, { useEffect, useState } from 'react';

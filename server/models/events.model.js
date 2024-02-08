@@ -1,5 +1,4 @@
-
-import { db } from "../config/db.js";
+import { db } from '../config/db.js';
 
 export const createEvent = async (eventData) => {
     return db('events').insert(eventData);
@@ -20,3 +19,4 @@ export const updateEvent = async (id, eventData) => {
 export const deleteEvent = async (id) => {
     return db('events').where('event_id', id).del();
 };
+

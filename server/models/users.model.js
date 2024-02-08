@@ -57,3 +57,26 @@ export const getUserEvents = async (userId) => {
     }
 };
 
+
+
+// import { db } from "../config/db.js";
+
+// export const register = async (username, email, password, role_id, availability) => {
+//     return db("users").insert({ username, email, password, role_id, availability }).returning('*');
+// };
+
+// export const getUserById = async (user_id) => {
+//     return db("users").select("*").where({ user_id }).first();
+// };
+
+// export const getUserByEmail = async (email) => {
+//     return db("users").select("*").where({ email }).first();
+// };
+
+// export const updateUser = async (user_id, userData) => {
+//     return db("users").where({ user_id }).update(userData).returning('*');
+// };
+
+// export const deleteUser = async (user_id) => {
+//     return db("users").where({ user_id }).del();
+// };
