@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { authenticateUser } from '../features/auth/authSlice';
 import { TextField, Button, Box } from '@mui/material';
-import CustomModal from './CustomModal'; // Adjust the file path based on your project structure
+import CustomModal from './CustomModal';
 
 const LoginRegister = ({ page }) => {
   const [email, setEmail] = useState('');
@@ -18,19 +18,19 @@ const LoginRegister = ({ page }) => {
     if (token && (page === 'Login' || page === 'Register')) {
       navigate('/profile');
     }
-    // Если есть ошибка, отображаем её в модальном окне
+    
     if (error) {
       setModalMessage(error);
       setIsModalOpen(true);
     }
   }, [token, navigate, page, error]);
 
-  const loginregister = async () => {
+  const loginRegister = async () => {
     try {
       await dispatch(authenticateUser({ email, password, url: page.toLowerCase() })).unwrap();
-      // Модальное окно автоматически закрывается через useEffect при успешном входе
+      
     } catch (dispatchError) {
-      // Обработка ошибки перенесена в useEffect
+      
     }
   };
 
@@ -61,7 +61,7 @@ const LoginRegister = ({ page }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button variant="contained" onClick={loginregister}>
+        <Button variant="contained" onClick={loginRegister}>
           {page}
         </Button>
       </Box>
@@ -72,5 +72,3 @@ const LoginRegister = ({ page }) => {
 };
 
 export default LoginRegister;
-
-

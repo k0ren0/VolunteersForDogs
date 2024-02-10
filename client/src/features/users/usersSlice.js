@@ -1,9 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+// import dotenv from "dotenv";
+// dotenv.config();
 
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL; // Assuming you have .env file configured with REACT_APP_API_URL
+// const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+const BASE_URL = process.env.REACT_APP_API_URL;
+    console.log("LOG ", BASE_URL);
+if (!BASE_URL) throw new Error('REACT_APP_API_URL is not defined');
+
+
+
 const axiosInstance = axios.create({
-    baseURL: REACT_APP_API_URL,
+    baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -57,7 +65,7 @@ export const fetchDogs = createAsyncThunk('users/fetchDogs', async (_, { getStat
     const token = getToken(getState);
     if (!token) return rejectWithValue('Token not found');
     try {
-        const response = await axiosInstance.get('/dogs', {
+        const response = await axiosInstance.get(`/dogs?user_id=${user_id}`, {
             headers: { 'Authorization': `Bearer ${token}` },
         });
         return response.data;

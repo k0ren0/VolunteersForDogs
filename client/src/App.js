@@ -6,7 +6,7 @@ import Nav from './components/Nav';
 import { useSelector } from 'react-redux';
 import Profile from "./components/Profile";
 import Events from './components/Events';
-import CreateEventForm from './components/CreateEventForm'; // Добавлено
+import CreateEventForm from './components/CreateEventForm'; 
 import DogsList from './components/DogsList';
 import AddDogForm from './components/AddDogForm';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -31,8 +31,8 @@ function App() {
             <Route path="/events" element={<Events />} />
             <Route path="/mydogs" element={<DogsList />} />
             <Route path="/adddog" element={<AddDogForm />} />
-            <Route path="/create-event" element={<CreateEventForm />} /> {/* Добавлено */}
-            {/* Условный рендеринг на основе роли пользователя */}
+            <Route path="/create-event" element={<CreateEventForm />} /> 
+            
             {user?.role === 'volunteer' && (
               <Route path="/create-event" element={<CreateEventForm />} />
             )}

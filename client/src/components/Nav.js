@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import { AppBar, Toolbar, IconButton, Button, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Box, useTheme, useMediaQuery } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link as RouterLink, useNavigate, } from 'react-router-dom'; //useLocation 
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 const Nav = () => {
   const { token } = useSelector((state) => state.auth);
@@ -13,7 +13,6 @@ const Nav = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
-  // const location = useLocation();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -27,35 +26,31 @@ const Nav = () => {
     setDrawerOpen(open);
   };
 
-  // const currentPage = location.pathname; // Current page from route
+  // useEffect(() => {
+  //   const checkTokenValidity = async () => {
+  //     try {
+  //       if (token) {
+  //         const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifytoken`, null, {
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //             'Authorization': `Bearer ${token}`,
+  //           },
+  //         });
 
-  useEffect(() => {
-    const checkTokenValidity = async () => {
-      try {
-        if (token) {
-          const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifytoken`, null, {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`, // Passing token in header
-              
-            },
-          });
-          console.log('API URL:', process.env.REACT_APP_API_URL);
+  //         if (response.status === 200) {
+  //           // If token is valid, keep the user on the current page
+  //         } else if (response.status === 401) {
+  //           // If token is invalid, redirect the user to the /login page
+  //           navigate('/login');
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error('Error checking token validity:', error);
+  //     }
+  //   };
 
-          if (response.status === 200) {
-            // If token is valid, keep the user on the current page
-          } else if (response.status === 401) {
-            // If token is invalid, redirect the user to the /login page
-            navigate('/login');
-          }
-        }
-      } catch (error) {
-        console.error('Error checking token validity:', error);
-      }
-    };
-
-    checkTokenValidity(); 
-  }, [token, navigate]);
+  //   checkTokenValidity(); 
+  // }, [token, navigate]);
 
   const links = [
     { title: "Home", path: "/", hidden: false },
@@ -137,6 +132,7 @@ const Nav = () => {
 };
 
 export default Nav;
+
 
 
 // import axios from 'axios';

@@ -13,7 +13,9 @@ export const _addDog = async (req, res) => {
 };
 
 export const _getDogsByUserId = async (req, res) => {
-  const user_id = req.user.user_id;
+  console.log("_getDogsByUserId work");
+  const {user_id }= req.query;
+  console.log("user_id ", user_id );
 
   try {
     const dogs = await DogsModel.getDogsByUserId(user_id);

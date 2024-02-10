@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, TextField, Button, Typography, CircularProgress, Card, CardContent, Tab, Tabs, Grid, Paper } from '@mui/material';
-import { updateUserProfile, fetchUsers, fetchDogs, fetchEvents, addDog } from '../features/users/usersSlice'; // Исправлены импорты
+import { updateUserProfile, fetchUsers, fetchDogs, fetchEvents, addDog } from '../features/users/usersSlice'; 
 import CustomModal from './CustomModal';
 import { selectUserProfile } from '../features/users/usersSlice';
 
