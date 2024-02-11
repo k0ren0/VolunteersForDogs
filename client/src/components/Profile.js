@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, TextField, Button, Typography, Card, CardContent, Tab, Tabs, Grid, Paper } from '@mui/material';
-import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents, addDog } from '../features/users/usersSlice';
+import { Box, TextField, Button, Typography, Paper, Tabs, Tab, Grid } from '@mui/material';
+import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents } from '../features/users/usersSlice';
 import CustomModal from './CustomModal';
-// Убедитесь, что пути к этим компонентам указаны правильно
 import DogsList from './DogsList';
 import AddDogForm from './AddDogForm';
+// import EventItem from './EventItem';
+// import EventsList from './EventsList';
 
 function Profile() {
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
   const usersState = useSelector((state) => state.users);
-  const { user, dogs, events } = usersState;
+  const { user } = usersState;
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -42,8 +43,8 @@ function Profile() {
     }
   }, [user]);
 
-  const handleUpdateProfile = () => {
-    if (!user || !user.user_id) {
+  const handleUpdateById = () => {
+    if (!user || !user_id) {
       console.error('User or User ID is undefined');
       setModalMessage('User information is not complete.');
       setIsModalOpen(true);
@@ -94,7 +95,8 @@ function Profile() {
         {selectedTab === 2 && (
           <Box mt={2}>
             <Typography variant="h5" gutterBottom>My Events</Typography>
-            {/* Код для отображения событий пользователя */}
+            {/* <EventItem/>
+            <EventsList/> */}
           </Box>
         )}
 
@@ -105,6 +107,7 @@ function Profile() {
 }
 
 export default Profile;
+
 
 
 // import React, { useEffect, useState } from 'react';

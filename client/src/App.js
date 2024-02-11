@@ -63,12 +63,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+
       </Routes>
     </ThemeProvider>
   );
 }
 
 export default App;
+
 
 
 
