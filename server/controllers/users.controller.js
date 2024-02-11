@@ -61,7 +61,7 @@ export const _all = async (req, res) => {
     }
 };
 
-export const _updateUserProfile = async (req, res) => {
+export const _updateUserById = async (req, res) => {
     const user_id = req.params.id;
     const { username, email, password, role_id, availability } = req.body;
 

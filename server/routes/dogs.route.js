@@ -9,9 +9,9 @@ router.get('/', verifytoken, _getDogsByUserId);
 router.put('/:dog_id', verifytoken, _updateDog);
 router.delete('/:dog_id', verifytoken, _deleteDog);
 
-// router.get("/api/verifytoken", verifytoken, (req, res) => {
-//     res.sendStatus(200);
-// });
+router.get("/api/verifytoken", verifytoken, (req, res) => {
+    res.sendStatus(200);
+});
 
 export default router;
 

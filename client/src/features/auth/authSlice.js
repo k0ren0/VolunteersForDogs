@@ -5,12 +5,15 @@ export const authenticateUser = createAsyncThunk(
   'auth/authenticate',
   async ({ email, password, url }, { rejectWithValue }) => {
     try {
+      console.log('Authenticating user...');
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/${url}`, {
         email,
         password,
       }, { withCredentials: true });
+      console.log('Authentication response:', response.data);
       return response.data;
     } catch (err) {
+      console.error('Authentication error:', err);
       if (err.response && err.response.data) {
         return rejectWithValue(err.response.data);
       } else {
@@ -25,6 +28,7 @@ export const authSlice = createSlice({
   initialState: {
     user: null,
     token: null,
+    user_id: null,
     status: 'idle',
     error: null,
   },
@@ -46,15 +50,19 @@ export const authSlice = createSlice({
         state.status = 'succeeded';
         state.token = action.payload.token;
         state.user = action.payload.user;
+        state.user_id = action.payload.user_id || null; 
       })
       .addCase(authenticateUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload.message;
       });
   },
+ 
 });
 
 export const { logout } = authSlice.actions;
+
+console.log("REACT_APP_API_URL:", process.env.REACT_APP_API_URL);
 
 export default authSlice.reducer;
 

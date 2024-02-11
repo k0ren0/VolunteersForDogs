@@ -10,9 +10,9 @@ router.get('/:id', verifytoken, getEventById);
 router.put('/:id', verifytoken, updateEvent);
 router.delete('/:id', verifytoken, deleteEvent);
 
-// router.get("/api/verifytoken", verifytoken, (req, res) => {
-//     res.sendStatus(200);
-// });
+router.get("/api/verifytoken", verifytoken, (req, res) => {
+    res.sendStatus(200);
+});
 
 export default router;
 

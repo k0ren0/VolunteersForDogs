@@ -28,6 +28,7 @@ export const getUserById = async (id) => {
     }
 };
 
+
 export const updateUser = async (user_id, userData) => {
     try {
         const result = await db('users').where({ user_id }).update(userData);
