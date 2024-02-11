@@ -4,14 +4,14 @@ import axios from 'axios';
 // dotenv.config();
 
 // const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-const BASE_URL = process.env.REACT_APP_API_URL;
-    console.log("LOG ", BASE_URL);
-if (!BASE_URL) throw new Error('REACT_APP_API_URL is not defined');
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+    console.log("LOG ", REACT_APP_API_URL);
+if (!REACT_APP_API_URL) throw new Error('REACT_APP_API_URL is not defined');
 
 
 
 const axiosInstance = axios.create({
-    baseURL: BASE_URL,
+    baseURL: REACT_APP_API_URL,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -48,11 +48,29 @@ export const updateUserProfile = createAsyncThunk('users/updateUserProfile', asy
     }
 });
 
+// export const addDog = createAsyncThunk('users/addDog', async (dogData, { getState, rejectWithValue }) => {
+//     const token = getToken(getState);
+//     if (!token) return rejectWithValue('Token not found');
+//     try {
+//         const response = await axiosInstance.post('/dogs', dogData, {
+//             headers: { 'Authorization': `Bearer ${token}` },
+//         });
+//         return response.data;
+//     } catch (err) {
+//         return rejectWithValue(err.response.data);
+//     }
+// });
+
 export const addDog = createAsyncThunk('users/addDog', async (dogData, { getState, rejectWithValue }) => {
     const token = getToken(getState);
+    const user_id = getState().auth.user_id; 
+
     if (!token) return rejectWithValue('Token not found');
+    if (!user_id) return rejectWithValue('User ID not found'); 
+
     try {
-        const response = await axiosInstance.post('/dogs', dogData, {
+        const dataWithUserId = { ...dogData, user_id }; 
+        const response = await axiosInstance.post('/dogs', dataWithUserId, {
             headers: { 'Authorization': `Bearer ${token}` },
         });
         return response.data;
@@ -61,9 +79,27 @@ export const addDog = createAsyncThunk('users/addDog', async (dogData, { getStat
     }
 });
 
+
+// export const fetchDogs = createAsyncThunk('users/fetchDogs', async (_, { getState, rejectWithValue }) => {
+//     const token = getToken(getState);
+//     if (!token) return rejectWithValue('Token not found');
+//     try {
+//         const response = await axiosInstance.get("/dogs?user_id=3", {
+//             headers: { 'Authorization': `Bearer ${token}` },
+//         });
+//         return response.data;
+//     } catch (err) {
+//         return rejectWithValue(err.response.data);
+//     }
+// });
+
 export const fetchDogs = createAsyncThunk('users/fetchDogs', async (_, { getState, rejectWithValue }) => {
     const token = getToken(getState);
+    const user_id = getState().auth.user_id; 
+
     if (!token) return rejectWithValue('Token not found');
+    if (!user_id) return rejectWithValue('User ID not found'); 
+
     try {
         const response = await axiosInstance.get(`/dogs?user_id=${user_id}`, {
             headers: { 'Authorization': `Bearer ${token}` },
@@ -73,6 +109,8 @@ export const fetchDogs = createAsyncThunk('users/fetchDogs', async (_, { getStat
         return rejectWithValue(err.response.data);
     }
 });
+
+
 
 export const fetchEvents = createAsyncThunk('users/fetchEvents', async (_, { getState, rejectWithValue }) => {
     const token = getToken(getState);

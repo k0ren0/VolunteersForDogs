@@ -2,12 +2,14 @@ import * as EventsModel from '../models/events.model.js';
 
 export const createEvent = async (req, res) => {
     try {
-        const newEvent = await EventsModel.createEvent(req.body);
+        const eventData = { ...req.body, user_id: req.user.userid }; // Добавляем user_id из токена аутентификации к данным события
+        const newEvent = await EventsModel.createEvent(eventData);
         res.status(201).json(newEvent);
     } catch (error) {
         res.status(500).json({ message: "Error creating event", error });
     }
 };
+
 
 export const getAllEvents = async (req, res) => {
     try {

@@ -15,22 +15,41 @@ const LoginRegister = ({ page }) => {
   const { error, token } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (token && (page === 'Login' || page === 'Register')) {
+    console.log(`[LoginRegister] Page: ${page}, Token: ${token ? token : 'undefined'}, Error: ${error}`);
+  
+    if (token && page === 'Register') {
+      console.log("[LoginRegister] Redirecting to login page...");
+      navigate('/login');
+      setModalMessage('You have been successfully registered!');
+      setIsModalOpen(true);
+    }
+  
+    if (token && page === 'Login') {
+      console.log("[LoginRegister] Redirecting to profile page...");
       navigate('/profile');
     }
-    
+  
     if (error) {
+      console.error(`[LoginRegister] Error: ${error}`);
       setModalMessage(error);
       setIsModalOpen(true);
     }
   }, [token, navigate, page, error]);
+  
 
   const loginRegister = async () => {
     try {
+      console.log(`[LoginRegister] Attempting to ${page.toLowerCase()}...`);
       await dispatch(authenticateUser({ email, password, url: page.toLowerCase() })).unwrap();
-      
+      console.log(`[LoginRegister] ${page} successful!`);
     } catch (dispatchError) {
-      
+      console.error(`[LoginRegister] Authentication Error: ${dispatchError}`);
+      if (dispatchError.message === 'Email already exists') {
+        setModalMessage('This email is already in use. Please choose another one.');
+      } else {
+        setModalMessage('Authentication failed. Please check your credentials and try again.');
+      }
+      setIsModalOpen(true);
     }
   };
 

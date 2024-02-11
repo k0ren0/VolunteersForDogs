@@ -4,12 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box, TextField, Button, Typography, CircularProgress, Card, CardContent, Tab, Tabs, Grid, Paper } from '@mui/material';
 import { updateUserProfile, fetchUsers, fetchDogs, fetchEvents, addDog } from '../features/users/usersSlice'; 
 import CustomModal from './CustomModal';
-import { selectUserProfile } from '../features/users/usersSlice';
+// Удалено импортирование selectUserProfile, так как оно не используется после исправления
 
 function Profile() {
   const dispatch = useDispatch();
+  // Изменено на прямой доступ к auth и users из состояния
   const { token } = useSelector((state) => state.auth);
-  const { user, events, dogs, status, error } = useSelector(selectUserProfile);
+  const usersState = useSelector((state) => state.users); // Получаем весь state users
+  const { user, events, dogs, status, error } = usersState; // Деструктуризация уже из usersState
+
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -27,8 +30,8 @@ function Profile() {
   useEffect(() => {
     if (token) {
       dispatch(fetchEvents());
-      dispatch(fetchUsers(id));
-      dispatch(fetchDogs());
+      dispatch(fetchUsers(id)); // Здесь нужно убедиться, что id правильно используется в fetchUsers
+      dispatch(fetchDogs(id)); // Обновлено для передачи id пользователя
     }
   }, [dispatch, token, id]);
 
@@ -79,7 +82,7 @@ function Profile() {
 
       <Paper sx={{ marginBottom: 2 }}>
         <Tabs value={selectedTab} onChange={handleTabChange} aria-label="profile tabs" centered>
-          <Tab label="My Info" />
+          <Tab label="My Profile" />
           <Tab label="My Dogs" />
           <Tab label="My Events" />
         </Tabs>
