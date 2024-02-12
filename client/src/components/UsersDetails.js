@@ -15,7 +15,7 @@ const UserDetails = ({ userId }) => {
       <h2>User Details</h2>
       <p>Username: {user.username}</p>
       <p>Email: {user.email}</p>
-      {/* Дополнительные данные пользователя */}
+   
     </div>
   );
 };

@@ -25,7 +25,6 @@ const DogsList = () => {
     };
 
     const updateDogList = () => {
-        // Обновляем список собак
         dispatch(fetchDogs());
     };
 
@@ -60,7 +59,7 @@ export default DogsList;
 
 
 
-// последнняя версия
+// 
 
 // import React, { useEffect } from 'react';
 // import { useSelector, useDispatch } from 'react-redux';

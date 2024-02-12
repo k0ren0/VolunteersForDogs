@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/register', _register);
 router.post('/login', _login);
 router.get('/', verifytoken, _all);
-router.put('/profile/:id', verifytoken, _updateUserProfile); // Добавленный маршрут
+router.put('/profile/:id', verifytoken, _updateUserProfile);
 
 // router.get("/api/verifytoken", verifytoken, (req, res) => {
 //     res.sendStatus(200);

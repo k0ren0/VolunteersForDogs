@@ -6,7 +6,7 @@ export const verifytoken = (req, res, next) => {
     let token = req.cookies.token || req.headers["authorization"];
     console.log("token", token);
 
-    // Удаление префикса 'Bearer ' из токена
+   
     if (token && token.startsWith('Bearer ')) {
         token = token.slice(7);
     }
@@ -29,7 +29,7 @@ export const verifytoken = (req, res, next) => {
             }
             return res.status(403).json({ error: err.message, msg });
         }
-        // Проверка, есть ли user_id в расшифрованных данных токена
+        
         if (!decoded.user_id) {
             return res.status(403).json({ error: "Unauthorized: User ID not found in token data" });
         }

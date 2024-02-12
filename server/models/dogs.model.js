@@ -1,7 +1,7 @@
 import { db } from '../config/db.js';
 
 export const addDog = async (user_id, breed_id, name, age, size) => {
-    return db('dogs').insert({ user_id, breed_id, name, age, size }).returning('*'); // Возвращаем добавленную запись
+    return db('dogs').insert({ user_id, breed_id, name, age, size }).returning('*');
 };
 
 export const getDogsByUserId = async (user_id) => {
@@ -13,7 +13,7 @@ export const getDogById = async (dog_id) => {
 };
 
 export const updateDogById = async (dog_id, user_id, breed_id, name, age, size) => {
-    return db('dogs').where({ dog_id, user_id }).update({ breed_id, name, age, size }).returning('*'); // Возвращаем обновленную запись
+    return db('dogs').where({ dog_id, user_id }).update({ breed_id, name, age, size }).returning('*');
 };
 
 export const deleteDogById = async (dog_id, user_id) => {

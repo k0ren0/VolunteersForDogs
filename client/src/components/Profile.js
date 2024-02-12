@@ -6,7 +6,7 @@ import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents 
 import CustomModal from './CustomModal';
 import DogsList from './DogsList';
 // import EditDogForm from './EditDogForm';
-import AddDogForm from './AddDogForm';
+// import AddDogForm from './AddDogForm';
 import UserProfileForm from './UserProfileForm';
 
 function Profile() {

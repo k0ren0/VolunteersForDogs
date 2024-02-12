@@ -2,7 +2,7 @@ import * as EventsModel from '../models/events.model.js';
 
 export const createEvent = async (req, res) => {
     try {
-        const eventData = { ...req.body, user_id: req.user.user_id }; // Добавляем user_id из токена аутентификации к данным события
+        const eventData = { ...req.body, user_id: req.user.user_id };
         const newEvent = await EventsModel.createEvent(eventData);
         res.status(201).json(newEvent);
     } catch (error) {
@@ -35,7 +35,7 @@ export const getEventById = async (req, res) => {
 
 export const _updateEvent = async (req, res) => {
     try {
-        const updatedEvent = await EventsModel.updateEvent(req.params.id, req.body); // Исправлено с updateEventById на updateEvent
+        const updatedEvent = await EventsModel.updateEvent(req.params.id, req.body);
         res.json(updatedEvent);
     } catch (error) {
         res.status(500).json({ message: "Error updating event", error });
@@ -44,7 +44,7 @@ export const _updateEvent = async (req, res) => {
 
 export const _deleteEvent = async (req, res) => {
     try {
-        await EventsModel.deleteEvent(req.params.id); // Исправлено с deleteEventById на deleteEvent
+        await EventsModel.deleteEvent(req.params.id); 
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: "Error deleting event", error });
@@ -57,7 +57,7 @@ export const _deleteEvent = async (req, res) => {
 
 // export const createEvent = async (req, res) => {
 //     try {
-//         const eventData = { ...req.body, user_id: req.user.userid }; // Добавляем user_id из токена аутентификации к данным события
+//         const eventData = { ...req.body, user_id: req.user.userid };
 //         const newEvent = await EventsModel.createEvent(eventData);
 //         res.status(201).json(newEvent);
 //     } catch (error) {

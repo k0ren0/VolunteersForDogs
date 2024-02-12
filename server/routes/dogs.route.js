@@ -1,11 +1,11 @@
 import express from "express";
 import { body, validationResult } from 'express-validator';
-import { verifytoken } from "../middleware/verifyToken.js";
+import { verifytoken } from "../middleware/verifyToken.js"
 import { db } from "../config/db.js";
 
 const router = express.Router();
 
-// Создание новой записи собаки с валидацией входных данных
+
 router.post('/', 
     verifytoken, 
     [
@@ -31,7 +31,7 @@ router.post('/',
     }
 );
 
-// Получение записей собак конкретного пользователя
+
 router.get('/', verifytoken, async (req, res) => {
     const user_id = req.user.user_id;
 
@@ -44,7 +44,7 @@ router.get('/', verifytoken, async (req, res) => {
     }
 });
 
-// Обновление существующей записи собаки
+
 router.put('/:dog_id', 
     verifytoken, 
     [
@@ -79,7 +79,7 @@ router.put('/:dog_id',
     }
 );
 
-// Удаление записи собаки
+
 router.delete('/:dog_id', verifytoken, async (req, res) => {
     const { dog_id } = req.params;
     const user_id = req.user.user_id;
