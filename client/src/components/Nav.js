@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import { AppBar, Toolbar, IconButton, Button, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Box, useTheme, useMediaQuery } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Link as RouterLink } from 'react-router-dom';
 
 const Nav = () => {
   const { token } = useSelector((state) => state.auth);
@@ -11,12 +11,10 @@ const Nav = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const handleLogout = () => {
     dispatch(logout());
-    if (isMobile) setDrawerOpen(false);
+    setDrawerOpen(false);
   };
 
   const toggleDrawer = (open) => (event) => {
@@ -26,76 +24,14 @@ const Nav = () => {
     setDrawerOpen(open);
   };
 
-  const currentPage = location.pathname; // Текущая страница из маршрута
-
-  const checkTokenValidity = async () => {
-    try {
-      const response = await fetch('/api/verifytoken', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      });
-
-      if (response.status === 200) {
-        // Если токен действителен, оставляем пользователя на текущей странице
-      } else if (response.status === 401) {
-        // Если токен не действителен, перенаправляем пользователя на страницу /login
-        navigate('/login');
-      }
-    } catch (error) {
-      console.error('Error checking token validity:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (token) {
-      checkTokenValidity();
-    }
-  }, [token]);
-
   const links = [
-    { title: "Home", path: "/", hidden: false },
+    { title: "Home", path: "/" },
     { title: "Login", path: "/login", hidden: !!token },
     { title: "Register", path: "/register", hidden: !!token },
     { title: "Profile", path: "/profile", hidden: !token },
     { title: "Events", path: "/events", hidden: !token },
+    { title: "Logout", action: handleLogout, hidden: !token },
   ];
-
-  const handleMenuItemClick = (path) => {
-    if (currentPage === path) {
-      // Если текущая страница совпадает с маршрутом элемента меню, ничего не делать
-      return;
-    }
-    navigate(path);
-  };
-
-  const drawerList = () => (
-    <Box
-      sx={{ width: 250 }}
-      role="presentation"
-      onClick={toggleDrawer(false)}
-      onKeyDown={toggleDrawer(false)}
-    >
-      <List>
-        {links.map((link, index) => !link.hidden && (
-          <ListItem key={index} disablePadding>
-            <ListItemButton onClick={() => handleMenuItemClick(link.path)}>
-              <ListItemText primary={link.title} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-        {token && (
-          <ListItem disablePadding>
-            <ListItemButton onClick={handleLogout}>
-              <ListItemText primary="Logout" />
-            </ListItemButton>
-          </ListItem>
-        )}
-      </List>
-    </Box>
-  );
 
   return (
     <>
@@ -105,40 +41,342 @@ const Nav = () => {
             <IconButton
               color="inherit"
               aria-label="open drawer"
-              edge="end"
+              edge="start"
               onClick={toggleDrawer(true)}
-              sx={{ ml: 'auto' }}
             >
               <MenuIcon />
             </IconButton>
           )}
-          <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             App Name
           </Typography>
-          {!isMobile && links.map((link) => !link.hidden && (
+          {!isMobile && links.filter(link => !link.hidden).map((link, index) => (
             <Button
-              key={link.title}
+              key={index}
               color="inherit"
-              onClick={() => handleMenuItemClick(link.path)}
-              sx={{ ml: 'auto' }}
+              component={link.path ? RouterLink : 'button'}
+              to={link.path}
+              onClick={link.action}
             >
               {link.title}
             </Button>
           ))}
-          {!isMobile && token && (
-            <Button color="inherit" onClick={handleLogout} sx={{ ml: 2 }}>Logout</Button>
-          )}
         </Toolbar>
       </AppBar>
-      <Drawer
-        anchor="right"
-        open={drawerOpen}
-        onClose={toggleDrawer(false)}
-      >
-        {drawerList()}
-      </Drawer>
+      {isMobile && (
+        <Drawer
+          anchor="left"
+          open={drawerOpen}
+          onClose={toggleDrawer(false)}
+        >
+          <Box
+            sx={{ width: 250 }}
+            role="presentation"
+            onClick={toggleDrawer(false)}
+            onKeyDown={toggleDrawer(false)}
+          >
+            <List>
+              {links.filter(link => !link.hidden).map((link, index) => (
+                <ListItem key={index} disablePadding>
+                  <ListItemButton component={link.path ? RouterLink : 'button'} to={link.path} onClick={link.action}>
+                    <ListItemText primary={link.title} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Drawer>
+      )}
     </>
   );
 };
 
 export default Nav;
+
+
+// // import axios from 'axios';
+// import React, { useState, } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { logout } from '../features/auth/authSlice';
+// import { AppBar, Toolbar, IconButton, Button, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Box, useTheme, useMediaQuery } from '@mui/material';
+// import MenuIcon from '@mui/icons-material/Menu';
+// import { Link as RouterLink } from 'react-router-dom'; //useNavigate
+
+// const Nav = () => {
+//   const { token } = useSelector((state) => state.auth);
+//   const dispatch = useDispatch();
+//   const [drawerOpen, setDrawerOpen] = useState(false);
+//   const theme = useTheme();
+//   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+//   // const navigate = useNavigate();
+
+//   const handleLogout = () => {
+//     dispatch(logout());
+//     if (isMobile) setDrawerOpen(false);
+//   };
+
+//   const toggleDrawer = (open) => (event) => {
+//     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+//       return;
+//     }
+//     setDrawerOpen(open);
+//   };
+
+//   // useEffect(() => {
+//   //   const checkTokenValidity = async () => {
+//   //     try {
+//   //       if (token) {
+//   //         const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifytoken`, null, {
+//   //           headers: {
+//   //             'Content-Type': 'application/json',
+//   //             'Authorization': `Bearer ${token}`,
+//   //           },
+//   //         });
+
+//   //         if (response.status === 200) {
+//   //           // If token is valid, keep the user on the current page
+//   //         } else if (response.status === 401) {
+//   //           // If token is invalid, redirect the user to the /login page
+//   //           navigate('/login');
+//   //         }
+//   //       }
+//   //     } catch (error) {
+//   //       console.error('Error checking token validity:', error);
+//   //     }
+//   //   };
+
+//   //   checkTokenValidity(); 
+//   // }, [token, navigate]);
+
+//   const links = [
+//     { title: "Home", path: "/", hidden: false },
+//     { title: "Login", path: "/login", hidden: !!token },
+//     { title: "Register", path: "/register", hidden: !!token },
+//     { title: "Profile", path: "/profile", hidden: !token },
+//     { title: "Events", path: "/events", hidden: !token },
+//   ];
+
+//   const drawerList = () => (
+//     <Box
+//       sx={{ width: 250 }}
+//       role="presentation"
+//       onClick={toggleDrawer(false)}
+//       onKeyDown={toggleDrawer(false)}
+//     >
+//       <List>
+//         {links.map((link) => !link.hidden && (
+//           <ListItem key={link.title} disablePadding>
+//             <ListItemButton component={RouterLink} to={link.path}>
+//               <ListItemText primary={link.title} />
+//             </ListItemButton>
+//           </ListItem>
+//         ))}
+//         {token && (
+//           <ListItem disablePadding>
+//             <ListItemButton onClick={handleLogout}>
+//               <ListItemText primary="Logout" />
+//             </ListItemButton>
+//           </ListItem>
+//         )}
+//       </List>
+//     </Box>
+//   );
+
+//   return (
+//     <>
+//       <AppBar position="static">
+//         <Toolbar>
+//           {isMobile && (
+//             <IconButton
+//               color="inherit"
+//               aria-label="open drawer"
+//               edge="end"
+//               onClick={toggleDrawer(true)}
+//               sx={{ ml: 'auto' }}
+//             >
+//               <MenuIcon />
+//             </IconButton>
+//           )}
+//           <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
+//             App Name
+//           </Typography>
+//           {!isMobile && links.map((link) => !link.hidden && (
+//             <Button
+//               key={link.title}
+//               color="inherit"
+//               component={RouterLink}
+//               to={link.path}
+//               sx={{ ml: 'auto' }}
+//             >
+//               {link.title}
+//             </Button>
+//           ))}
+//           {!isMobile && token && (
+//             <Button color="inherit" onClick={handleLogout} sx={{ ml: 2 }}>Logout</Button>
+//           )}
+//         </Toolbar>
+//       </AppBar>
+//       <Drawer
+//         anchor="right"
+//         open={drawerOpen}
+//         onClose={toggleDrawer(false)}
+//       >
+//         {drawerList()}
+//       </Drawer>
+//     </>
+//   );
+// };
+
+// export default Nav;
+
+
+
+// import axios from 'axios';
+// import React, { useState, useEffect } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { logout } from '../features/auth/authSlice';
+// import { AppBar, Toolbar, IconButton, Button, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Box, useTheme, useMediaQuery } from '@mui/material';
+// import MenuIcon from '@mui/icons-material/Menu';
+// import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
+
+// const Nav = () => {
+//   const { token } = useSelector((state) => state.auth);
+//   const dispatch = useDispatch();
+//   const [drawerOpen, setDrawerOpen] = useState(false);
+//   const theme = useTheme();
+//   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+//   const navigate = useNavigate();
+//   const location = useLocation();
+
+//   const handleLogout = () => {
+//     dispatch(logout());
+//     if (isMobile) setDrawerOpen(false);
+//   };
+
+//   const toggleDrawer = (open) => (event) => {
+//     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+//       return;
+//     }
+//     setDrawerOpen(open);
+//   };
+
+//   const currentPage = location.pathname; // Current page from route
+
+//   useEffect(() => {
+//     checkTokenValidity();
+//   }, [token]);
+
+//   const checkTokenValidity = async () => {
+//     try {
+//       if (token) {
+//         const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifytoken`, null, {
+//           headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${token}`, // Passing token in header
+            
+//           },
+//         });
+//         console.log('API URL:', process.env.REACT_APP_API_URL);
+
+//         if (response.status === 200) {
+//           // If token is valid, keep the user on the current page
+//         } else if (response.status === 401) {
+//           // If token is invalid, redirect the user to the /login page
+//           navigate('/login');
+//         }
+//       }
+//     } catch (error) {
+//       console.error('Error checking token validity:', error);
+//     }
+//   };
+
+//   const links = [
+//     { title: "Home", path: "/", hidden: false },
+//     { title: "Login", path: "/login", hidden: !!token },
+//     { title: "Register", path: "/register", hidden: !!token },
+//     { title: "Profile", path: "/profile", hidden: !token },
+//     { title: "Events", path: "/events", hidden: !token },
+//   ];
+
+//   const handleMenuItemClick = (path) => {
+//     if (currentPage === path) {
+//       // If current page matches menu item route, do nothing
+//       return;
+//     }
+//     navigate(path);
+//   };
+
+//   const drawerList = () => (
+//     <Box
+//       sx={{ width: 250 }}
+//       role="presentation"
+//       onClick={toggleDrawer(false)}
+//       onKeyDown={toggleDrawer(false)}
+//     >
+//       <List>
+//         {links.map((link) => !link.hidden && (
+//           <ListItem key={link.title} disablePadding>
+//             <ListItemButton component={RouterLink} to={link.path}>
+//               <ListItemText primary={link.title} />
+//             </ListItemButton>
+//           </ListItem>
+//         ))}
+//         {token && (
+//           <ListItem disablePadding>
+//             <ListItemButton onClick={handleLogout}>
+//               <ListItemText primary="Logout" />
+//             </ListItemButton>
+//           </ListItem>
+//         )}
+//       </List>
+//     </Box>
+//   );
+
+//   return (
+//     <>
+//       <AppBar position="static">
+//         <Toolbar>
+//           {isMobile && (
+//             <IconButton
+//               color="inherit"
+//               aria-label="open drawer"
+//               edge="end"
+//               onClick={toggleDrawer(true)}
+//               sx={{ ml: 'auto' }}
+//             >
+//               <MenuIcon />
+//             </IconButton>
+//           )}
+//           <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
+//             App Name
+//           </Typography>
+//           {!isMobile && links.map((link) => !link.hidden && (
+//             <Button
+//               key={link.title}
+//               color="inherit"
+//               component={RouterLink}
+//               to={link.path}
+//               sx={{ ml: 'auto' }}
+//             >
+//               {link.title}
+//             </Button>
+//           ))}
+//           {!isMobile && token && (
+//             <Button color="inherit" onClick={handleLogout} sx={{ ml: 2 }}>Logout</Button>
+//           )}
+//         </Toolbar>
+//       </AppBar>
+//       <Drawer
+//         anchor="right"
+//         open={drawerOpen}
+//         onClose={toggleDrawer(false)}
+//       >
+//         {drawerList()}
+//       </Drawer>
+//     </>
+//   );
+// };
+
+// export default Nav;
+
+

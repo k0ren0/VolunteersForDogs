@@ -1,45 +1,60 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { authenticateUser } from '../features/auth/authSlice';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, Typography, Paper, Tabs, Tab, Grid } from '@mui/material';
+import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents } from '../features/users/usersSlice';
 import CustomModal from './CustomModal';
+import DogsList from './DogsList';
+// import EditDogForm from './EditDogForm';
+// import AddDogForm from './AddDogForm';
+import UserProfileForm from './UserProfileForm';
 
-const LoginRegister = ({ page }) => {
+function Profile() {
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth);
+  const usersState = useSelector((state) => state.users);
+  const { user } = usersState;
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { error, token } = useSelector((state) => state.auth); // Получаем токен из состояния
+  const [selectedTab, setSelectedTab] = useState(0);
+  const { id: user_id } = useParams();
 
-  const loginregister = async () => {
-    try {
-      const response = await dispatch(authenticateUser({ email, password, url: page.toLowerCase() })).unwrap();
-      navigate('/');
-    } catch (error) {
-      let errorMessage = '';
-
-      if (page === 'Login') {
-        if (error?.message === 'email not found') {
-          errorMessage = 'This email is not registered. Please sign up.';
-        } else if (error?.message === 'incorrect password') {
-          errorMessage = 'The password you entered is incorrect. Please try again.';
-        } else {
-          errorMessage = 'Error during login.';
-        }
-      } else if (page === 'Register') {
-        if (error?.message === 'email already in use') {
-          errorMessage = 'This email is already in use. Please use a different email.';
-        } else {
-          errorMessage = 'Error during registration.';
-        }
-      }
-
-      setModalMessage(errorMessage);
-      setIsModalOpen(true);
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchEvents());
+      dispatch(fetchUserById(user_id));
+      dispatch(fetchDogs(user_id));
+      dispatch(fetchUserEvents(user_id));
     }
+  }, [dispatch, token, user_id]);
+  
+  useEffect(() => {
+    if (user) {
+      setEmail(user.email || '');
+      setUsername(user.username || '');
+      setFirstName(user.firstName || '');
+      setLastName(user.lastName || '');
+      setDateOfBirth(user.dateOfBirth || '');
+    }
+  }, [user]);
+
+  const handleUpdateById = () => {
+    if (!user || !user_id) {
+      console.error('User or User ID is undefined');
+      setModalMessage('User information is not complete.');
+      setIsModalOpen(true);
+      return;
+    }
+  
+    dispatch(updateUserById({
+      userId: user.user_id,
+      userData: { email, username, firstName, lastName, dateOfBirth },
+    }));
   };
 
   const closeModal = () => {
@@ -47,42 +62,169 @@ const LoginRegister = ({ page }) => {
     setModalMessage('');
   };
 
-  // Проверяем наличие токена и решаем, куда перенаправить пользователя
-  if (token) {
-    // Если есть токен, перенаправляем на "Profile" или "Events" (в зависимости от page)
-    navigate(page === 'Login' ? '/profile' : '/events');
-    return null; // Рендер не требуется, так как происходит перенаправление
-  }
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
 
   return (
-    <div>
-      <h1>{page}</h1>
-      <Box component="form" sx={{ m: 1 }} noValidate autoComplete="off">
-        <TextField
-          sx={{ m: 1 }}
-          id="email"
-          type="email"
-          label="Enter your email"
-          variant="outlined"
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          sx={{ m: 1 }}
-          id="password"
-          type="password"
-          label="Enter your password"
-          variant="outlined"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button variant="contained" onClick={loginregister}>
-          {page}
-        </Button>
+    <Box p={3}>
+      <Typography variant="h4" gutterBottom>My Info</Typography>
+      <Paper sx={{ marginBottom: 2 }}>
+        <Tabs value={selectedTab} onChange={handleTabChange} aria-label="profile tabs" centered>
+          <Tab label="My Profile" />
+          <Tab label="My Dogs" />
+          <Tab label="My Events" />
+        </Tabs>
+      </Paper>
+
+      <Box mt={2}>
+        {selectedTab === 0 && user && (
+          <Grid container spacing={2}>
+            <UserProfileForm userData={user} onUpdate={handleUpdateById} />
+          </Grid>
+        )}
+
+        {selectedTab === 1 && (
+          <Box mt={2}>
+            <Typography variant="h5" gutterBottom>My Dogs</Typography>
+            <DogsList />
+            {/* <EditDogForm /> */}
+            {/* <AddDogForm /> */}
+          </Box>
+        )}
+
+        {selectedTab === 2 && (
+          <Box mt={2}>
+            <Typography variant="h5" gutterBottom>My Events</Typography>
+            {/* <EventItem/>
+            <EventsList/> */}
+          </Box>
+        )}
+
+        <CustomModal isOpen={isModalOpen} message={modalMessage} onRequestClose={closeModal} />
       </Box>
-
-      <CustomModal isOpen={isModalOpen} message={modalMessage} onRequestClose={closeModal} />
-    </div>
+    </Box>
   );
-};
+}
 
-export default LoginRegister;
+export default Profile;
+
+
+
+
+// import React, { useEffect, useState } from 'react';
+// import { useParams } from 'react-router-dom';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { Box, TextField, Button, Typography, Paper, Tabs, Tab, Grid } from '@mui/material';
+// import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents } from '../features/users/usersSlice';
+// import CustomModal from './CustomModal';
+// import DogsList from './DogsList';
+// import AddDogForm from './AddDogForm';
+// import UserProfileForm from './UserProfileForm';
+
+
+// // import EventItem from './EventItem';
+// // import EventsList from './EventsList';
+
+// function Profile() {
+//   const dispatch = useDispatch();
+//   const { token } = useSelector((state) => state.auth);
+//   const usersState = useSelector((state) => state.users);
+//   const { user } = usersState;
+//   const [email, setEmail] = useState('');
+//   const [username, setUsername] = useState('');
+//   const [firstName, setFirstName] = useState('');
+//   const [lastName, setLastName] = useState('');
+//   const [dateOfBirth, setDateOfBirth] = useState('');
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [modalMessage, setModalMessage] = useState('');
+//   const [selectedTab, setSelectedTab] = useState(0);
+//   const { id: user_id } = useParams();
+
+//   useEffect(() => {
+//     if (token) {
+//       dispatch(fetchEvents());
+//       dispatch(fetchUserById(user_id));
+//       dispatch(fetchDogs(user_id));
+//       dispatch(fetchUserEvents(user_id));
+//     }
+//   }, [dispatch, token, user_id]);
+  
+//   useEffect(() => {
+//     if (user) {
+//       setEmail(user.email || '');
+//       setUsername(user.username || '');
+//       setFirstName(user.firstName || '');
+//       setLastName(user.lastName || '');
+//       setDateOfBirth(user.dateOfBirth || '');
+//     }
+//   }, [user]);
+
+//   const handleUpdateById = () => {
+//     if (!user || !user_id) {
+//       console.error('User or User ID is undefined');
+//       setModalMessage('User information is not complete.');
+//       setIsModalOpen(true);
+//       return;
+//     }
+  
+//     dispatch(updateUserById({
+//       userId: user.user_id,
+//       userData: { email, username, firstName, lastName, dateOfBirth },
+//     }));
+//   };
+
+//   const closeModal = () => {
+//     setIsModalOpen(false);
+//     setModalMessage('');
+//   };
+
+//   const handleTabChange = (event, newValue) => {
+//     setSelectedTab(newValue);
+//   };
+
+//   return (
+//     <Box p={3}>
+//       <Typography variant="h4" gutterBottom>My Info</Typography>
+//       <Paper sx={{ marginBottom: 2 }}>
+//         <Tabs value={selectedTab} onChange={handleTabChange} aria-label="profile tabs" centered>
+//           <Tab label="My Profile" />
+//           <Tab label="My Dogs" />
+//           <Tab label="My Events" />
+//         </Tabs>
+//       </Paper>
+
+//       <Box mt={2}>
+//         {selectedTab === 0 && user && (
+//           <Grid container spacing={2}>
+//             <UserProfileForm userData={user} onUpdate={handleUpdateById} />
+
+//           </Grid>
+//         )}
+
+//         {selectedTab === 1 && (
+//           <Box mt={2}>
+//             <Typography variant="h5" gutterBottom>My Dogs</Typography>
+//             <DogsList />
+//             <AddDogForm />
+//           </Box>
+//         )}
+
+//         {selectedTab === 2 && (
+//           <Box mt={2}>
+//             <Typography variant="h5" gutterBottom>My Events</Typography>
+//             {/* <EventItem/>
+//             <EventsList/> */}
+//           </Box>
+//         )}
+
+//         <CustomModal isOpen={isModalOpen} message={modalMessage} onRequestClose={closeModal} />
+//       </Box>
+//     </Box>
+//   );
+// }
+
+// export default Profile;
+
+
 

@@ -12,3 +12,4 @@ export const db = knex ({
       database: process.env.DB_NAME,
     },
 });
+

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { authenticateUser } from '../features/auth/authSlice';
-import { Box, TextField, Button } from '@mui/material';
+import { TextField, Button, Box } from '@mui/material';
 import CustomModal from './CustomModal';
 
 const LoginRegister = ({ page }) => {
@@ -12,40 +12,27 @@ const LoginRegister = ({ page }) => {
   const [modalMessage, setModalMessage] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { error } = useSelector((state) => state.auth);
+  const { error, token, user } = useSelector((state) => state.auth);
 
-  const loginregister = async () => {
+  const loginRegister = async () => {
     try {
-      const response = await dispatch(authenticateUser({ email, password, url: page.toLowerCase() })).unwrap();
-      navigate('/');
-    } catch (error) {
-      let errorMessage = '';
-
-      if (page === 'Login') {
-        if (error?.message === 'email not found') {
-          errorMessage = 'This email is not registered. Please sign up.';
-        } else if (error?.message === 'incorrect password') {
-          errorMessage = 'The password you entered is incorrect. Please try again.';
-        } else {
-          errorMessage = 'Error during login.';
-        }
-      } else if (page === 'Register') {
-        if (error?.message === 'email already in use') {
-          errorMessage = 'This email is already in use. Please use a different email.';
-        } else {
-          errorMessage = 'Error during registration.';
-        }
+      await dispatch(authenticateUser({ email, password, url: page.toLowerCase() })).unwrap();
+      if (page === 'Register') {
+        setModalMessage('You have been successfully registered! Please login.');
+        setIsModalOpen(true);
       }
-
+    } catch (dispatchError) {
+      const errorMessage = dispatchError.message || 'Authentication failed. Please check your credentials and try again.';
       setModalMessage(errorMessage);
       setIsModalOpen(true);
     }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalMessage('');
-  };
+  useEffect(() => {
+    if (token && user && user.user_id) {
+      navigate(page === 'Register' ? '/login' : '/profile');
+    }
+  }, [token, user, page, navigate]);
 
   return (
     <div>
@@ -57,6 +44,7 @@ const LoginRegister = ({ page }) => {
           type="email"
           label="Enter your email"
           variant="outlined"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
@@ -65,14 +53,15 @@ const LoginRegister = ({ page }) => {
           type="password"
           label="Enter your password"
           variant="outlined"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button variant="contained" onClick={loginregister}>
+        <Button variant="contained" onClick={loginRegister}>
           {page}
         </Button>
       </Box>
 
-      <CustomModal isOpen={isModalOpen} message={modalMessage} onRequestClose={closeModal} />
+      <CustomModal isOpen={isModalOpen} message={modalMessage} onRequestClose={() => setIsModalOpen(false)} />
     </div>
   );
 };
@@ -80,56 +69,65 @@ const LoginRegister = ({ page }) => {
 export default LoginRegister;
 
 
-
-
-
-// import React, { useState } from 'react';
-// import { useDispatch, useSelector } from 'react-redux';
+// import React, { useState, useEffect } from 'react';
 // import { useNavigate } from 'react-router-dom';
+// import { useDispatch, useSelector } from 'react-redux';
 // import { authenticateUser } from '../features/auth/authSlice';
-// import { Box, TextField, Button } from '@mui/material';
+// import { TextField, Button, Box } from '@mui/material';
+// import CustomModal from './CustomModal';
 
 // const LoginRegister = ({ page }) => {
 //   const [email, setEmail] = useState('');
 //   const [password, setPassword] = useState('');
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [modalMessage, setModalMessage] = useState('');
 //   const dispatch = useDispatch();
 //   const navigate = useNavigate();
-//   const { error } = useSelector((state) => state.auth);
+//   const { error, token, user } = useSelector((state) => state.auth);
 
-//   const loginregister = async () => {
+//   const loginRegister = async () => {
 //     try {
-//       const response = await dispatch(authenticateUser({ email, password, url: page.toLowerCase() })).unwrap();
-//       navigate('/');
-//     } catch (error) {
-//       let errorMessage = '';
-
-//       if (page === 'Login') {
-//         if (error && error.message) {
-//           if (error.message.includes('email not found')) {
-//             errorMessage = 'This email is not registered. Please sign up.';
-//           } else if (error.message.includes('incorrect password')) {
-//             errorMessage = 'The password you entered is incorrect. Please try again.';
-//           } else {
-//             errorMessage = 'Error during login.';
-//           }
-//         } else {
-//           errorMessage = 'Error during login.';
-//         }
-//       } else if (page === 'Register') {
-//         if (error && error.message) {
-//           if (error.message.includes('email already in use')) {
-//             errorMessage = 'This email is already in use. Please use a different email.';
-//           } else {
-//             errorMessage = 'Error during registration.';
-//           }
-//         } else {
-//           errorMessage = 'Error during registration.';
-//         }
+//       console.log('Trying to login/register...');
+//       console.log('Email:', email);
+//       console.log('Password:', password);
+//       await dispatch(authenticateUser({ email, password, url: page.toLowerCase() })).unwrap();
+//       console.log('Login/Register successful!');
+//     } catch (dispatchError) {
+//       console.error('Authentication Error:', dispatchError);
+//       if (dispatchError.message === 'Email already exists') {
+//         setModalMessage('This email is already in use. Please choose another one.');
+//       } else {
+//         setModalMessage('Authentication failed. Please check your credentials and try again.');
 //       }
-
-//       alert(errorMessage);
+//       setIsModalOpen(true);
 //     }
 //   };
+
+//   const closeModal = () => {
+//     setIsModalOpen(false);
+//     setModalMessage('');
+//   };
+
+//   useEffect(() => {
+//     if (token && user && user.user_id) {
+//       if (page === 'Register') {
+//         console.log("[LoginRegister] Redirecting to login page...");
+//         navigate('/login');
+//         setModalMessage('You have been successfully registered!');
+//         setIsModalOpen(true);
+//       } else if (page === 'Login') {
+//         console.log("[LoginRegister] Redirecting to profile page...");
+//         navigate('/profile');
+//       }
+//     }
+//   }, [token, user, page, navigate]);
+
+
+//   if (error) {
+//     console.error(`[LoginRegister] Error: ${error}`);
+//     setModalMessage(error);
+//     setIsModalOpen(true);
+//   }
 
 //   return (
 //     <div>
@@ -141,6 +139,7 @@ export default LoginRegister;
 //           type="email"
 //           label="Enter your email"
 //           variant="outlined"
+//           value={email}
 //           onChange={(e) => setEmail(e.target.value)}
 //         />
 //         <TextField
@@ -149,12 +148,15 @@ export default LoginRegister;
 //           type="password"
 //           label="Enter your password"
 //           variant="outlined"
+//           value={password}
 //           onChange={(e) => setPassword(e.target.value)}
 //         />
-//         <Button variant="contained" onClick={loginregister}>
+//         <Button variant="contained" onClick={loginRegister}>
 //           {page}
 //         </Button>
 //       </Box>
+
+//       <CustomModal isOpen={isModalOpen} message={modalMessage} onRequestClose={closeModal} />
 //     </div>
 //   );
 // };

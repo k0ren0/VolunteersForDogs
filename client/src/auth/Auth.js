@@ -2,6 +2,7 @@ import { useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../App";
 import { useNavigate } from "react-router-dom";
+import { verifytoken } from "../middleware/verifyToken";
 
 axios.defaults.withCredentials = true;
 
@@ -10,33 +11,37 @@ const Auth = ({ children }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const verify = async () => {
+        const verifytoken = async () => {
             if (!token) {
                 navigate("/login");
                 return;
             }
-
+           
             try {
-                await axios.get("http://localhost:5005/users/verify", {
+                await axios.get("http://localhost:5005/api/verifytoken", {
                     headers: {
                         "authorization": `Bearer ${token}`,
                     },
                 });
-                // Предполагаем, что успешный ответ означает, что токен валиден
-                // Нет необходимости обновлять токен через setToken, если он валиден
             } catch (error) {
                 console.error("Verification failed:", error);
-                if (error.response && error.response.status === 403) {
-                    // При ошибке 403 (например, токен недействителен) мы могли бы очистить токен
-                    setToken(null); // Удаляем токен из контекста, что подразумевает необходимость повторного входа
-                    navigate("/login");
+                if (error.response && error.response.data) {
+                    if (error.response.status === 403) {
+                        // In case of 403 error (e.g., token is invalid), we could clear the token
+                        setToken(null); // Remove token from context, implying the need for re-login
+                        navigate("/login");
+                    } else {
+                        // Handling other errors, e.g., showing error message or logging
+                        console.error("Other error:", error.response.data);
+                    }
                 } else {
-                    // Обработка других ошибок, например, показ сообщения об ошибке или логирование
+                    // Handling other errors not related to server response
+                    console.error("Network error or server is not responding:", error);
                 }
             }
         };
 
-        verify();
+        verifytoken(); 
     }, [navigate, token, setToken]);
 
     return children;
