@@ -1,4 +1,4 @@
-import { register, login, getAllUsers, updateUserById, getUserById, getUserDogsById, getUserEventsById } from "../models/users.model.js";
+import { register, login, getAllUsers, updateUserById, getUserById, getUserDogsById, getUserEventsById, checkEmailExists } from "../models/users.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -39,15 +39,24 @@ export const _register = async (req, res) => {
     const { email, password } = req.body;
     const lowerEmail = email.toLowerCase();
 
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(password, salt);
-
     try {
-        await register(lowerEmail, hash);
-        res.status(201).json({ message: 'User created successfully' });
+        const emailExists = await checkEmailExists(lowerEmail);
+        if (emailExists) {
+            return res.status(400).json({ msg: "Email already exists" });
+        }
+
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password, salt);
+
+        const registrationResult = await register(lowerEmail, hash);
+        if (registrationResult.success) {
+            res.status(201).json({ message: 'User created successfully' });
+        } else {
+            res.status(400).json({ message: registrationResult.message });
+        }
     } catch (error) {
         console.log("_register =>", error);
-        res.status(500).json({ msg: "Email exists" });
+        res.status(500).json({ msg: "An error occurred during registration" });
     }
 };
 
@@ -111,7 +120,7 @@ export const _fetchUserEvents = async (req, res) => {
 };
 
 
-// import { register, login, all, updateUser, getUserById, getUserDogs, getUserEvents } from "../models/users.model.js";
+// import { register, login, getAllUsers, updateUserById, getUserById, getUserDogsById, getUserEventsById } from "../models/users.model.js";
 // import bcrypt from "bcrypt";
 // import jwt from "jsonwebtoken";
 // import dotenv from "dotenv";
@@ -131,11 +140,10 @@ export const _fetchUserEvents = async (req, res) => {
 //             return res.status(400).json({ msg: "Wrong password" });
 //         }
 
-//         const userid = user.user_id;
-//         const useremail = user.email;
-
+//         const user_id = user.user_id;
 //         const secret = process.env.ACCESS_TOKEN_SECRET;
-//         const token = jwt.sign({ userid, useremail }, secret, { expiresIn: "1h" });
+
+//         const token = jwt.sign({ user_id }, secret, { expiresIn: '1h' });
 
 //         res.cookie("token", token, {
 //             maxAge: 3600 * 1000, // 1 hour
@@ -167,7 +175,7 @@ export const _fetchUserEvents = async (req, res) => {
 
 // export const _all = async (req, res) => {
 //     try {
-//         const users = await all();
+//         const users = await getAllUsers();
 //         res.json(users);
 //     } catch (error) {
 //         res.status(500).json({ message: "Error fetching users", error });
@@ -180,7 +188,7 @@ export const _fetchUserEvents = async (req, res) => {
 
 //     try {
 //         const userData = { username, email, password, role_id, availability };
-//         await updateUser(user_id, userData);
+//         await updateUserById(user_id, userData);
 //         res.json({ message: "User profile updated successfully" });
 //     } catch (error) {
 //         res.status(500).json({ message: "Error updating user profile", error });
@@ -205,9 +213,9 @@ export const _fetchUserEvents = async (req, res) => {
 // };
 
 // export const _fetchUserDogs = async (req, res) => {
-//     const user_id = req.user.userid;
+//     const user_id = req.user.user_id;
 //     try {
-//         const dogs = await getUserDogs(user_id);
+//         const dogs = await getUserDogsById(user_id);
 //         res.json(dogs);
 //     } catch (error) {
 //         res.status(500).json({ msg: "Error fetching user's dogs" });
@@ -215,13 +223,11 @@ export const _fetchUserEvents = async (req, res) => {
 // };
 
 // export const _fetchUserEvents = async (req, res) => {
-//     const user_id = req.user.userid;
+//     const user_id = req.user.user_id;
 //     try {
-//         const events = await getUserEvents(user_id);
+//         const events = await getUserEventsById(user_id);
 //         res.json(events);
 //     } catch (error) {
 //         res.status(500).json({ msg: "Error fetching user's events" });
 //     }
 // };
-
-
