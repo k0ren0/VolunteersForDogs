@@ -5,7 +5,7 @@ import { Box, Typography, Paper, Tabs, Tab, Grid } from '@mui/material';
 import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents } from '../features/users/usersSlice';
 import CustomModal from './CustomModal';
 import DogsList from './DogsList';
-// import EditDogForm from './EditDogForm';
+import EditDogForm from './EditDogForm';
 // import AddDogForm from './AddDogForm';
 import UserProfileForm from './UserProfileForm';
 
@@ -88,7 +88,7 @@ function Profile() {
           <Box mt={2}>
             <Typography variant="h5" gutterBottom>My Dogs</Typography>
             <DogsList />
-            {/* <EditDogForm /> */}
+            <EditDogForm />
             {/* <AddDogForm /> */}
           </Box>
         )}
