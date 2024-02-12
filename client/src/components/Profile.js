@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, TextField, Button, Typography, Paper, Tabs, Tab, Grid } from '@mui/material';
+import { Box, Typography, Paper, Tabs, Tab, Grid } from '@mui/material';
 import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents } from '../features/users/usersSlice';
 import CustomModal from './CustomModal';
 import DogsList from './DogsList';
+import EditDogForm from './EditDogForm';
 import AddDogForm from './AddDogForm';
-// import EventItem from './EventItem';
-// import EventsList from './EventsList';
+import UserProfileForm from './UserProfileForm';
 
 function Profile() {
   const dispatch = useDispatch();
@@ -80,7 +80,7 @@ function Profile() {
       <Box mt={2}>
         {selectedTab === 0 && user && (
           <Grid container spacing={2}>
-            {/* Форма профиля пользователя */}
+            <UserProfileForm userData={user} onUpdate={handleUpdateById} />
           </Grid>
         )}
 
@@ -88,6 +88,7 @@ function Profile() {
           <Box mt={2}>
             <Typography variant="h5" gutterBottom>My Dogs</Typography>
             <DogsList />
+            <EditDogForm />
             <AddDogForm />
           </Box>
         )}
@@ -110,33 +111,37 @@ export default Profile;
 
 
 
+
 // import React, { useEffect, useState } from 'react';
 // import { useParams } from 'react-router-dom';
 // import { useDispatch, useSelector } from 'react-redux';
-// import { Box, TextField, Button, Typography, Card, CardContent, Tab, Tabs, Grid, Paper } from '@mui/material';
-// import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents, addDog } from '../features/users/usersSlice';
+// import { Box, TextField, Button, Typography, Paper, Tabs, Tab, Grid } from '@mui/material';
+// import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents } from '../features/users/usersSlice';
 // import CustomModal from './CustomModal';
+// import DogsList from './DogsList';
+// import AddDogForm from './AddDogForm';
+// import UserProfileForm from './UserProfileForm';
+
+
+// // import EventItem from './EventItem';
+// // import EventsList from './EventsList';
 
 // function Profile() {
 //   const dispatch = useDispatch();
 //   const { token } = useSelector((state) => state.auth);
 //   const usersState = useSelector((state) => state.users);
-//   const { user, dogs, events } = usersState;
+//   const { user } = usersState;
 //   const [email, setEmail] = useState('');
 //   const [username, setUsername] = useState('');
 //   const [firstName, setFirstName] = useState('');
 //   const [lastName, setLastName] = useState('');
 //   const [dateOfBirth, setDateOfBirth] = useState('');
-//   const [dogName, setDogName] = useState('');
-//   const [dogBreed, setDogBreed] = useState('');
-//   const [dogAge, setDogAge] = useState('');
 //   const [isModalOpen, setIsModalOpen] = useState(false);
 //   const [modalMessage, setModalMessage] = useState('');
 //   const [selectedTab, setSelectedTab] = useState(0);
 //   const { id: user_id } = useParams();
 
 //   useEffect(() => {
-//     console.log('Effect for fetching data with token:', token);
 //     if (token) {
 //       dispatch(fetchEvents());
 //       dispatch(fetchUserById(user_id));
@@ -146,7 +151,6 @@ export default Profile;
 //   }, [dispatch, token, user_id]);
   
 //   useEffect(() => {
-//     console.log('User data effect:', user);
 //     if (user) {
 //       setEmail(user.email || '');
 //       setUsername(user.username || '');
@@ -156,9 +160,8 @@ export default Profile;
 //     }
 //   }, [user]);
 
-//   const handleUpdateProfile = () => {
-//     console.log('Updating profile with data:', { email, username, firstName, lastName, dateOfBirth });
-//     if (!user || !user.user_id) {
+//   const handleUpdateById = () => {
+//     if (!user || !user_id) {
 //       console.error('User or User ID is undefined');
 //       setModalMessage('User information is not complete.');
 //       setIsModalOpen(true);
@@ -171,29 +174,18 @@ export default Profile;
 //     }));
 //   };
 
-//   const handleAddDog = () => {
-//     console.log('Adding dog with data:', { dogName, dogBreed, dogAge });
-//     dispatch(addDog({ name: dogName, breed: dogBreed, age: dogAge }));
-//     setDogName('');
-//     setDogBreed('');
-//     setDogAge('');
-//   };
-
 //   const closeModal = () => {
-//     console.log('Closing modal');
 //     setIsModalOpen(false);
 //     setModalMessage('');
 //   };
 
 //   const handleTabChange = (event, newValue) => {
-//     console.log('Changing tab to:', newValue);
 //     setSelectedTab(newValue);
 //   };
 
 //   return (
 //     <Box p={3}>
 //       <Typography variant="h4" gutterBottom>My Info</Typography>
-
 //       <Paper sx={{ marginBottom: 2 }}>
 //         <Tabs value={selectedTab} onChange={handleTabChange} aria-label="profile tabs" centered>
 //           <Tab label="My Profile" />
@@ -205,75 +197,24 @@ export default Profile;
 //       <Box mt={2}>
 //         {selectedTab === 0 && user && (
 //           <Grid container spacing={2}>
-//             <Grid item xs={12} sm={6}>
-//               <TextField label="Email" variant="outlined" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} />
-//             </Grid>
-//             <Grid item xs={12} sm={6}>
-//               <TextField label="Username" variant="outlined" fullWidth value={username} onChange={(e) => setUsername(e.target.value)} />
-//             </Grid>
-//             <Grid item xs={12} sm={6}>
-//               <TextField label="First Name" variant="outlined" fullWidth value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-//             </Grid>
-//             <Grid item xs={12} sm={6}>
-//               <TextField label="Last Name" variant="outlined" fullWidth value={lastName} onChange={(e) => setLastName(e.target.value)} />
-//             </Grid>
-//             <Grid item xs={12} sm={6}>
-//               <TextField label="Date of Birth" variant="outlined" fullWidth type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
-//             </Grid>
-//             <Grid item xs={12}>
-//               <Button variant="contained" color="primary" onClick={handleUpdateProfile} sx={{ mt: 2 }}>Save</Button>
-//             </Grid>
+//             <UserProfileForm userData={user} onUpdate={handleUpdateById} />
+
 //           </Grid>
 //         )}
 
 //         {selectedTab === 1 && (
 //           <Box mt={2}>
 //             <Typography variant="h5" gutterBottom>My Dogs</Typography>
-//             {dogs.map((dog) => (
-//               <Card key={dog.dog_id}>
-//                 <CardContent>
-//                   <Typography variant="h6" component="div">
-//                     {dog.name}
-//                   </Typography>
-//                   <Typography color="text.secondary">
-//                     Breed: {dog.breed}, Age: {dog.age}
-//                   </Typography>
-//                 </CardContent>
-//               </Card>
-//             ))}
-//             <Grid container spacing={2} mt={2}>
-//               <Grid item xs={12} sm={4}>
-//                 <TextField label="Dog Name" variant="outlined" fullWidth value={dogName} onChange={(e) => setDogName(e.target.value)} />
-//               </Grid>
-//               <Grid item xs={12} sm={4}>
-//                 <TextField label="Dog Breed" variant="outlined" fullWidth value={dogBreed} onChange={(e) => setDogBreed(e.target.value)} />
-//               </Grid>
-//               <Grid item xs={12} sm={4}>
-//                 <TextField label="Dog Age" variant="outlined" fullWidth value={dogAge} onChange={(e) => setDogAge(e.target.value)} />
-//               </Grid>
-//               <Grid item xs={12}>
-//                 <Button variant="contained" color="primary" onClick={handleAddDog}>Add Dog</Button>
-//               </Grid>
-//             </Grid>
+//             <DogsList />
+//             <AddDogForm />
 //           </Box>
 //         )}
 
 //         {selectedTab === 2 && (
 //           <Box mt={2}>
 //             <Typography variant="h5" gutterBottom>My Events</Typography>
-//             {/* Рендеринг событий пользователя */}
-//             {events.map((event) => (
-//               <Card key={event.event_id}>
-//                 <CardContent>
-//                   <Typography variant="h6" component="div">
-//                     {event.name}
-//                   </Typography>
-//                   <Typography color="text.secondary">
-//                     Date: {event.date}, Location: {event.location}
-//                   </Typography>
-//                 </CardContent>
-//               </Card>
-//             ))}
+//             {/* <EventItem/>
+//             <EventsList/> */}
 //           </Box>
 //         )}
 
@@ -284,7 +225,6 @@ export default Profile;
 // }
 
 // export default Profile;
-
 
 
 

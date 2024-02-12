@@ -11,6 +11,8 @@ import DogsList from './components/DogsList';
 import AddDogForm from './components/AddDogForm';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import EditDogForm from './components/EditDogForm';
+
 
 const theme = createTheme();
 
@@ -55,6 +57,11 @@ function App() {
           path="/adddog"
           element={<ProtectedRoute><AddDogForm /></ProtectedRoute>}
         />
+        <Route
+          path="/dogs/:id/edit"
+          element={<ProtectedRoute><EditDogForm /></ProtectedRoute>}
+        />
+
         <Route
           path="/create-event"
           element={
