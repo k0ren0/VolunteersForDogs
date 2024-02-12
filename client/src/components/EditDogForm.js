@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TextField, Button, Box, Snackbar, Select, MenuItem, CircularProgress, Typography } from '@mui/material';
-import { useNavigate } from 'react-router'; // Import useNavigate
+// Убран import { useNavigate }, так как он закомментирован и не используется
 import { updateDog, fetchDogs } from '../features/dogs/dogsSlice';
 
 const EditDogForm = () => {
@@ -15,7 +15,6 @@ const EditDogForm = () => {
     const dispatch = useDispatch();
     const { dogs } = useSelector((state) => state.dogs);
     const [breedsList, setBreedsList] = useState([]);
-    const navigate = useNavigate(); // Use useNavigate hook
 
     useEffect(() => {
         dispatch(fetchDogs());
@@ -53,9 +52,10 @@ const EditDogForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(updateDog({ dogId: selectedDogId, dogData: { name, breed: selectedBreed, age: Number(age) } }));
+        await dispatch(updateDog({ dogId: selectedDogId, dogData: { name, breed: selectedBreed, age: Number(age) } }));
         setOpenSnackbar(true);
-        navigate(-1); // Use navigate instead of history.goBack()
+        // После обновления собаки, обновляем список собак в состоянии приложения
+        dispatch(fetchDogs());
     };
 
     const handleCloseSnackbar = () => {
@@ -69,14 +69,14 @@ const EditDogForm = () => {
                 <Select value={selectedDogId || ''} onChange={(e) => setSelectedDogId(e.target.value)} displayEmpty inputProps={{ 'aria-label': 'Select Dog' }} required>
                     <MenuItem value="" disabled>Select Dog</MenuItem>
                     {dogs.map((dog) => (
-                        <MenuItem key={dog.dog_id} value={dog.dog_id.toString()}>{dog.name}</MenuItem>
+                        dog.dog_id ? <MenuItem key={dog.dog_id} value={dog.dog_id.toString()}>{dog.name}</MenuItem> : null
                     ))}
                 </Select>
                 <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
                 <Select value={selectedBreed} onChange={(e) => setSelectedBreed(e.target.value)} displayEmpty required>
                     <MenuItem value="" disabled>Breed</MenuItem>
                     {breedsList.map((breed, index) => (
-                        <MenuItem key={index} value={breed}>{breed}</MenuItem>
+                        breed ? <MenuItem key={index} value={breed}>{breed}</MenuItem> : null
                     ))}
                 </Select>
                 <TextField label="Age" type="number" value={age} onChange={(e) => setAge(e.target.value)} required />
