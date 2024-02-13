@@ -6,8 +6,11 @@ import { updateUserById, fetchUserById, fetchUserEvents, fetchDogs, fetchEvents 
 import CustomModal from './CustomModal';
 import DogsList from './DogsList';
 import EditDogForm from './EditDogForm';
-// import AddDogForm from './AddDogForm';
 import UserProfileForm from './UserProfileForm';
+// import AddDogForm from './AddDogForm';
+import AddEventForm from './AddEventForm';
+import EventsList from './EventsList';
+// import EditEventForm from './EditEventForm';
 
 function Profile() {
   const dispatch = useDispatch();
@@ -89,15 +92,16 @@ function Profile() {
             <Typography variant="h5" gutterBottom>My Dogs</Typography>
             <DogsList />
             <EditDogForm />
-            {/* <AddDogForm /> */}
+            {/* <AddDogForm/> */}
           </Box>
         )}
 
         {selectedTab === 2 && (
           <Box mt={2}>
             <Typography variant="h5" gutterBottom>My Events</Typography>
-            {/* <EventItem/>
-            <EventsList/> */}
+            <EventsList />
+            {/* <EditEventForm /> */}
+            <AddEventForm />
           </Box>
         )}
 
@@ -108,6 +112,7 @@ function Profile() {
 }
 
 export default Profile;
+
 
 
 

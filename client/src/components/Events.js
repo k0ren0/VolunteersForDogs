@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchEvents, createEvent, updateEvent, deleteEvent } from '../features/events/eventsSlice';
+import { fetchEvents, addEvent, updateEvent, deleteEvent } from '../features/events/eventsSlice';
 import {
   TextField, Button, Typography, CircularProgress, Box, Table,
   TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
@@ -35,7 +35,7 @@ function Events() {
     if (editingEventId) {
       await dispatch(updateEvent({ ...newEventData, id: editingEventId }));
     } else {
-      await dispatch(createEvent(newEventData));
+      await dispatch(addEvent(newEventData));
     }
     setNewEventData({
       title: '',
