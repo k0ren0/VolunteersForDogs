@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchEvents, addEvent, updateEvent, deleteEvent } from '../features/events/eventsSlice';
+import { fetchFilteredEvents } from '../features/events/eventsSlice';
 import {
   TextField, Button, Typography, CircularProgress, Box, Table,
-  TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
+  TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 
 function Events() {
@@ -13,103 +13,94 @@ function Events() {
   const { token } = useSelector(state => state.auth);
   const { events, status, error } = useSelector(state => state.events);
 
-  const [newEventData, setNewEventData] = useState({
+  const [filter, setFilter] = useState({
     title: '',
-    description: '',
+    city: '',
     date: '',
-    location: '',
-    volunteer_needed: 0,
-    dogBreed: ''
+    event_type: '',
+    start_time: '',
+    end_time: '',
+    dogBreed: '',
+    day_of_week: ''
   });
-  const [editingEventId, setEditingEventId] = useState(null);
 
   useEffect(() => {
     if (token) {
-      dispatch(fetchEvents());
+      dispatch(fetchFilteredEvents(filter));
     } else {
       navigate('/login');
     }
-  }, [dispatch, navigate, token]);
-
-  const handleEventAction = async () => {
-    if (editingEventId) {
-      await dispatch(updateEvent({ ...newEventData, id: editingEventId }));
-    } else {
-      await dispatch(addEvent(newEventData));
-    }
-    setNewEventData({
-      title: '',
-      description: '',
-      date: '',
-      location: '',
-      volunteer_needed: 0,
-      dogBreed: ''
-    });
-    setEditingEventId(null);
-  };
+  }, [dispatch, navigate, token, filter]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setNewEventData(prev => ({ ...prev, [name]: value }));
+    setFilter(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleEditEvent = (eventId) => {
-    const event = events.find(e => e.id === eventId);
-    setNewEventData(event);
-    setEditingEventId(eventId);
-  };
-
-  const handleDeleteEvent = async (eventId) => {
-    await dispatch(deleteEvent(eventId));
+  const handleFilterEvents = () => {
+    dispatch(fetchFilteredEvents(filter));
   };
 
   return (
     <Box sx={{ p: 2 }}>
-      <Typography variant="h4" gutterBottom>Manage Events</Typography>
-      <Box sx={{ mb: 2 }}>
-        {/* Event Form */}
-        <TextField name="title" label="Title" value={newEventData.title} onChange={handleInputChange} sx={{ mr: 2 }} />
-        <TextField name="description" label="Description" value={newEventData.description} onChange={handleInputChange} sx={{ mr: 2 }} />
-        <TextField name="date" label="Date" type="date" value={newEventData.date} onChange={handleInputChange} InputLabelProps={{ shrink: true }} sx={{ mr: 2 }} />
-        <TextField name="location" label="Location" value={newEventData.location} onChange={handleInputChange} sx={{ mr: 2 }} />
-        <TextField name="volunteer_needed" label="Volunteers Needed" type="number" value={newEventData.volunteer_needed} onChange={handleInputChange} sx={{ mr: 2 }} />
-        <TextField name="dogBreed" label="Dog Breed" value={newEventData.dogBreed} onChange={handleInputChange} />
-        <Button variant="contained" color="primary" onClick={handleEventAction} sx={{ mt: 3 }}>
-          {editingEventId ? 'Save Changes' : 'Create Event'}
-        </Button>
+      <Typography variant="h4" gutterBottom>Filter Events</Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+        <TextField name="title" label="Title" value={filter.title} onChange={handleInputChange} />
+        <TextField name="city" label="City" value={filter.city} onChange={handleInputChange} />
+        <TextField name="date" label="Date" type="date" value={filter.date} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
+        <FormControl fullWidth>
+          <InputLabel>Event Type</InputLabel>
+          <Select name="event_type" value={filter.event_type} label="Event Type" onChange={handleInputChange}>
+            <MenuItem value=""><em>None</em></MenuItem>
+            <MenuItem value="volunteer">Volunteer</MenuItem>
+            <MenuItem value="customer">Customer</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField name="start_time" label="Start Time" type="time" value={filter.start_time} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
+        <TextField name="end_time" label="End Time" type="time" value={filter.end_time} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
+        <TextField name="dogBreed" label="Dog Breed" value={filter.dogBreed} onChange={handleInputChange} />
+        <FormControl fullWidth>
+          <InputLabel>Day of Week</InputLabel>
+          <Select name="day_of_week" value={filter.day_of_week} label="Day of Week" onChange={handleInputChange}>
+            <MenuItem value=""><em>Any</em></MenuItem>
+            <MenuItem value="Monday">Monday</MenuItem>
+            <MenuItem value="Tuesday">Tuesday</MenuItem>
+            <MenuItem value="Wednesday">Wednesday</MenuItem>
+            <MenuItem value="Thursday">Thursday</MenuItem>
+            <MenuItem value="Friday">Friday</MenuItem>
+            <MenuItem value="Saturday">Saturday</MenuItem>
+            <MenuItem value="Sunday">Sunday</MenuItem>
+          </Select>
+        </FormControl>
+        <Button variant="contained" color="primary" onClick={handleFilterEvents}>Filter</Button>
       </Box>
-
-      {status === 'loading' ? <CircularProgress /> : error ? <Typography color="error">Error: {error}</Typography> : (
+      
+      {status === 'loading' ? <CircularProgress /> : error ? <Typography color="error">{`Error: ${error}`}</Typography> : (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Title</TableCell>
-                <TableCell>Description</TableCell>
+                <TableCell>City</TableCell>
                 <TableCell>Date</TableCell>
-                <TableCell>Location</TableCell>
-                <TableCell>Volunteers Needed</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Start Time</TableCell>
+                <TableCell>End Time</TableCell>
                 <TableCell>Dog Breed</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell>Day of Week</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {events.map(event => (
-                <TableRow key={event.id}>
+                <TableRow key={event.event_id}>
                   <TableCell>{event.title}</TableCell>
-                  <TableCell>{event.description}</TableCell>
+                  <TableCell>{event.city}</TableCell>
                   <TableCell>{event.date}</TableCell>
-                  <TableCell>{event.location}</TableCell>
-                  <TableCell>{event.volunteer_needed}</TableCell>
+                  <TableCell>{event.event_type}</TableCell>
+                  <TableCell>{event.start_time}</TableCell>
+                  <TableCell>{event.end_time}</TableCell>
                   <TableCell>{event.dogBreed}</TableCell>
-                  <TableCell>
-                    <Button onClick={() => handleEditEvent(event.id)} color="primary" variant="contained" sx={{ mr: 1 }}>
-                      Edit
-                    </Button>
-                    <Button onClick={() => handleDeleteEvent(event.id)} color="secondary" variant="contained">
-                      Delete
-                    </Button>
-                  </TableCell>
+                  <TableCell>{event.day_of_week}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -124,10 +115,12 @@ export default Events;
 
 
 
+
+
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import { useNavigate } from 'react-router-dom';
-// import { fetchEvents, createEvent, updateEvent, deleteEvent } from '../features/events/eventsSlice';
+// import { fetchEvents, addEvent, updateEvent, deleteEvent } from '../features/events/eventsSlice';
 // import {
 //   TextField, Button, Typography, CircularProgress, Box, Table,
 //   TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
@@ -148,14 +141,6 @@ export default Events;
 //     dogBreed: ''
 //   });
 //   const [editingEventId, setEditingEventId] = useState(null);
-//   const [filters, setFilters] = useState({
-//     title: '',
-//     description: '',
-//     date: '',
-//     location: '',
-//     volunteer_needed: '',
-//     dogBreed: ''
-//   });
 
 //   useEffect(() => {
 //     if (token) {
@@ -169,7 +154,7 @@ export default Events;
 //     if (editingEventId) {
 //       await dispatch(updateEvent({ ...newEventData, id: editingEventId }));
 //     } else {
-//       await dispatch(createEvent(newEventData));
+//       await dispatch(addEvent(newEventData));
 //     }
 //     setNewEventData({
 //       title: '',
@@ -180,17 +165,11 @@ export default Events;
 //       dogBreed: ''
 //     });
 //     setEditingEventId(null);
-//     dispatch(fetchEvents());
 //   };
 
 //   const handleInputChange = (event) => {
 //     const { name, value } = event.target;
 //     setNewEventData(prev => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleFilterChange = (event) => {
-//     const { name, value } = event.target;
-//     setFilters(prevFilters => ({ ...prevFilters, [name]: value }));
 //   };
 
 //   const handleEditEvent = (eventId) => {
@@ -201,23 +180,13 @@ export default Events;
 
 //   const handleDeleteEvent = async (eventId) => {
 //     await dispatch(deleteEvent(eventId));
-//     dispatch(fetchEvents());
 //   };
-
-//   const filteredEvents = events.filter(event =>
-//     Object.entries(filters).every(([key, value]) =>
-//       !value || event[key].toString().toLowerCase().includes(value.toLowerCase())
-//     )
-//   );
-
-//   if (status === 'loading') return <CircularProgress />;
-//   if (error) return <Typography color="error">Error: {error}</Typography>;
 
 //   return (
 //     <Box sx={{ p: 2 }}>
 //       <Typography variant="h4" gutterBottom>Manage Events</Typography>
 //       <Box sx={{ mb: 2 }}>
-//         {/* Form fields and action button */}
+//         {/* Event Form */}
 //         <TextField name="title" label="Title" value={newEventData.title} onChange={handleInputChange} sx={{ mr: 2 }} />
 //         <TextField name="description" label="Description" value={newEventData.description} onChange={handleInputChange} sx={{ mr: 2 }} />
 //         <TextField name="date" label="Date" type="date" value={newEventData.date} onChange={handleInputChange} InputLabelProps={{ shrink: true }} sx={{ mr: 2 }} />
@@ -229,64 +198,47 @@ export default Events;
 //         </Button>
 //       </Box>
 
-//       <Box sx={{ mb: 2 }}>
-//         {/* Filters */}
-//         {Object.keys(filters).map(key => (
-//           <TextField
-//             key={key}
-//             name={key}
-//             label={key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')}
-//             value={filters[key]}
-//             onChange={handleFilterChange}
-//             sx={{ m: 1 }}
-//             type={key === 'date' ? 'date' : 'text'}
-//             InputLabelProps={key === 'date' ? { shrink: true } : undefined}
-//           />
-//         ))}
-//       </Box>
-
-//       <TableContainer component={Paper}>
-//         <Table>
-//           <TableHead>
-//             <TableRow>
-//               <TableCell>Title</TableCell>
-//               <TableCell>Description</TableCell>
-//               <TableCell>Date</TableCell>
-//               <TableCell>Location</TableCell>
-//               <TableCell>Volunteers Needed</TableCell>
-//               <TableCell>Dog Breed</TableCell>
-//               <TableCell>Actions</TableCell>
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {filteredEvents.map(event => (
-//               <TableRow key={event.id}>
-//                 <TableCell>{event.title}</TableCell>
-//                 <TableCell>{event.description}</TableCell>
-//                 <TableCell>{event.date}</TableCell>
-//                 <TableCell>{event.location}</TableCell>
-//                 <TableCell>{event.volunteer_needed}</TableCell>
-//                 <TableCell>{event.dogBreed}</TableCell>
-//                 <TableCell>
-//                   <Button onClick={() => handleEditEvent(event.id)} color="primary" variant="contained" sx={{ mr: 1 }}>
-//                     Edit
-//                   </Button>
-//                   <Button onClick={() => handleDeleteEvent(event.id)} color="secondary" variant="contained">
-//                     Delete
-//                   </Button>
-//                 </TableCell>
+//       {status === 'loading' ? <CircularProgress /> : error ? <Typography color="error">Error: {error}</Typography> : (
+//         <TableContainer component={Paper}>
+//           <Table>
+//             <TableHead>
+//               <TableRow>
+//                 <TableCell>Title</TableCell>
+//                 <TableCell>Description</TableCell>
+//                 <TableCell>Date</TableCell>
+//                 <TableCell>Location</TableCell>
+//                 <TableCell>Volunteers Needed</TableCell>
+//                 <TableCell>Dog Breed</TableCell>
+//                 <TableCell>Actions</TableCell>
 //               </TableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
+//             </TableHead>
+//             <TableBody>
+//               {events.map(event => (
+//                 <TableRow key={event.id}>
+//                   <TableCell>{event.title}</TableCell>
+//                   <TableCell>{event.description}</TableCell>
+//                   <TableCell>{event.date}</TableCell>
+//                   <TableCell>{event.location}</TableCell>
+//                   <TableCell>{event.volunteer_needed}</TableCell>
+//                   <TableCell>{event.dogBreed}</TableCell>
+//                   <TableCell>
+//                     <Button onClick={() => handleEditEvent(event.id)} color="primary" variant="contained" sx={{ mr: 1 }}>
+//                       Edit
+//                     </Button>
+//                     <Button onClick={() => handleDeleteEvent(event.id)} color="secondary" variant="contained">
+//                       Delete
+//                     </Button>
+//                   </TableCell>
+//                 </TableRow>
+//               ))}
+//             </TableBody>
+//           </Table>
+//         </TableContainer>
+//       )}
 //     </Box>
 //   );
 // }
 
 // export default Events;
-
-
-
 
 

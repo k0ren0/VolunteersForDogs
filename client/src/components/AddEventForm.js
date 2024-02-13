@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { TextField, Button, Box, Snackbar, Select, MenuItem } from '@mui/material';
 import { addEvent } from '../features/events/eventsSlice';
-
-const eventTypes = ['volunteer', 'customer'];
-const daysOfWeekOptions = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+import { fetchUserDogs, selectUserDogs } from '../features/dogs/dogsSlice';
 
 const AddEventForm = ({ updateEventList }) => {
     const [title, setTitle] = useState('');
@@ -17,22 +15,27 @@ const AddEventForm = ({ updateEventList }) => {
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [daysOfWeek, setDaysOfWeek] = useState([]);
+    const [selectedDog, setSelectedDog] = useState(''); // Состояние для хранения выбранной собаки
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const dispatch = useDispatch();
+    const userDogs = useSelector(selectUserDogs); // Получаем список собак пользователя
 
     useEffect(() => {
-        // Заглушка для API, которая будет выполняться при монтировании компонента
-        // В реальном проекте здесь должен быть код для получения данных
-        console.log('API call placeholder');
-    }, []);
+        const loadUserDogs = async () => {
+            try {
+                await dispatch(fetchUserDogs());
+            } catch (error) {
+                console.error('Error fetching user dogs:', error);
+            }
+        };
+
+        loadUserDogs();
+    }, [dispatch]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         
         try {
-            const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-            if (!REACT_APP_API_URL) throw new Error('REACT_APP_API_URL is not defined');
-
             await dispatch(addEvent({
                 title,
                 description,
@@ -43,7 +46,8 @@ const AddEventForm = ({ updateEventList }) => {
                 eventType,
                 startTime,
                 endTime,
-                days_of_week: daysOfWeek.join(', ')
+                days_of_week: daysOfWeek.join(', '),
+                dogId: selectedDog // Добавляем выбранную собаку в объект события
             }));
 
             setTitle('');
@@ -56,6 +60,7 @@ const AddEventForm = ({ updateEventList }) => {
             setStartTime('');
             setEndTime('');
             setDaysOfWeek([]);
+            setSelectedDog(''); // Сбрасываем выбранную собаку
 
             setOpenSnackbar(true);
 
@@ -78,7 +83,7 @@ const AddEventForm = ({ updateEventList }) => {
             component="form"
             onSubmit={handleSubmit}
             sx={{
-                '& > :not(style)': { m:   1 }
+                '& > :not(style)': { m: 1 }
             }}
             noValidate
             autoComplete="off"
@@ -125,11 +130,8 @@ const AddEventForm = ({ updateEventList }) => {
                 onChange={(e) => setEventType(e.target.value)}
                 required
             >
-                {eventTypes.map((type) => (
-                    <MenuItem key={type} value={type}>
-                        {type}
-                    </MenuItem>
-                ))}
+                <MenuItem value="volunteer">Volunteer</MenuItem>
+                <MenuItem value="customer">Customer</MenuItem>
             </Select>
             <TextField
                 label="Start Time"
@@ -138,7 +140,7 @@ const AddEventForm = ({ updateEventList }) => {
                 onChange={(e) => setStartTime(e.target.value)}
                 required
                 inputProps={{
-                    step:   900, //   15 минут
+                    step: 900, // 15 минут
                 }}
             />
             <TextField
@@ -148,18 +150,34 @@ const AddEventForm = ({ updateEventList }) => {
                 onChange={(e) => setEndTime(e.target.value)}
                 required
                 inputProps={{
-                    step:   900, //   15 минут
+                    step: 900, // 15 минут
                 }}
             />
+            <Select
+                label="Dog"
+                value={selectedDog}
+                onChange={(e) => setSelectedDog(e.target.value)}
+                required
+            >
+                {userDogs.map((dog) => (
+                    <MenuItem key={dog.id} value={dog.id}>
+                        {dog.name}
+                    </MenuItem>
+                ))}
+            </Select>
             <Select
                 label="Days of Week"
                 multiple
                 value={daysOfWeek}
                 onChange={handleDayChange}
             >
-                {daysOfWeekOptions.map((day, index) => (
-                    <MenuItem key={index} value={day}>{day}</MenuItem>
-                ))}
+                <MenuItem value="Sunday">Sunday</MenuItem>
+                <MenuItem value="Monday">Monday</MenuItem>
+                <MenuItem value="Tuesday">Tuesday</MenuItem>
+                <MenuItem value="Wednesday">Wednesday</MenuItem>
+                <MenuItem value="Thursday">Thursday</MenuItem>
+                <MenuItem value="Friday">Friday</MenuItem>
+                <MenuItem value="Saturday">Saturday</MenuItem>
             </Select>
             <Button type="submit" variant="contained">Add Event</Button>
             <Snackbar
@@ -176,12 +194,16 @@ export default AddEventForm;
 
 
 
+
+
+
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch } from 'react-redux';
 // import { TextField, Button, Box, Snackbar, Select, MenuItem } from '@mui/material';
 // import { addEvent } from '../features/events/eventsSlice';
 
 // const eventTypes = ['volunteer', 'customer'];
+// const daysOfWeekOptions = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // const AddEventForm = ({ updateEventList }) => {
 //     const [title, setTitle] = useState('');
@@ -198,9 +220,9 @@ export default AddEventForm;
 //     const dispatch = useDispatch();
 
 //     useEffect(() => {
-//         // Здесь можно добавить  логику для получения данных, если это необходимо
-//         // Например, загрузка списка стран или городов
-//         console.log('Placeholder for additional API calls');
+//         // Заглушка для API, которая будет выполняться при монтировании компонента
+//         // В реальном проекте здесь должен быть код для получения данных
+//         console.log('API call placeholder');
 //     }, []);
 
 //     const handleSubmit = async (e) => {
@@ -220,7 +242,7 @@ export default AddEventForm;
 //                 eventType,
 //                 startTime,
 //                 endTime,
-//                 days_of_week: daysOfWeek.join(', ') // Исправлено название поля
+//                 days_of_week: daysOfWeek.join(', ')
 //             }));
 
 //             setTitle('');
@@ -236,15 +258,18 @@ export default AddEventForm;
 
 //             setOpenSnackbar(true);
 
-//             // После успешного добавления обновляем список событий
 //             updateEventList();
 //         } catch (error) {
-//             console.error('Error saving event:', error);
+//             console.error('Error adding event:', error);
 //         }
 //     };
 
 //     const handleCloseSnackbar = () => {
 //         setOpenSnackbar(false);
+//     };
+
+//     const handleDayChange = (event) => {
+//         setDaysOfWeek(event.target.value);
 //     };
 
 //     return (
@@ -300,7 +325,9 @@ export default AddEventForm;
 //                 required
 //             >
 //                 {eventTypes.map((type) => (
-//                     <MenuItem key={type} value={type}>{type}</MenuItem>
+//                     <MenuItem key={type} value={type}>
+//                         {type}
+//                     </MenuItem>
 //                 ))}
 //             </Select>
 //             <TextField
@@ -323,6 +350,16 @@ export default AddEventForm;
 //                     step:   900, //   15 минут
 //                 }}
 //             />
+//             <Select
+//                 label="Days of Week"
+//                 multiple
+//                 value={daysOfWeek}
+//                 onChange={handleDayChange}
+//             >
+//                 {daysOfWeekOptions.map((day, index) => (
+//                     <MenuItem key={index} value={day}>{day}</MenuItem>
+//                 ))}
+//             </Select>
 //             <Button type="submit" variant="contained">Add Event</Button>
 //             <Snackbar
 //                 open={openSnackbar}
@@ -335,7 +372,6 @@ export default AddEventForm;
 // };
 
 // export default AddEventForm;
-
 
 
 

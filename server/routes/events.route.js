@@ -41,6 +41,51 @@ router.post('/',
 );
 
 router.get('/', verifytoken, async (req, res) => {
+    const { title, city, date, event_type, start_time, end_time, dogBreed, days_of_week } = req.query;
+    const user_id = req.user.user_id;
+
+    try {
+        // Построение запроса с фильтрацией
+        let query = db('events').where({ user_id });
+        
+        if (title) {
+            query = query.andWhere('title', 'like', `%${title}%`);
+        }
+        if (city) {
+            query = query.andWhere('city', '=', city);
+        }
+        if (date) {
+            query = query.andWhere('date', '=', date);
+        }
+        if (event_type) {
+            query = query.andWhere('event_type', '=', event_type);
+        }
+        if (start_time) {
+            query = query.andWhere('start_time', '>=', start_time);
+        }
+        if (end_time) {
+            query = query.andWhere('end_time', '<=', end_time);
+        }
+        if (dogBreed) {
+            // Предполагается, что в вашей таблице есть столбец dogBreed
+            query = query.andWhere('dogBreed', 'like', `%${dogBreed}%`);
+        }
+        if (days_of_week) {
+            // Предполагается, что days_of_week хранится как строка
+            query = query.andWhere('days_of_week', 'like', `%${days_of_week}%`);
+        }
+
+        const events = await query;
+        res.json(events);
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        res.status(500).json({ error: 'Error fetching events' });
+    }
+});
+
+
+
+router.get('/', verifytoken, async (req, res) => {
     const user_id = req.user.user_id;
 
     try {

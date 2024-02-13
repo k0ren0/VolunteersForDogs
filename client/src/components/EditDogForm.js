@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TextField, Button, Box, Snackbar, Select, MenuItem, CircularProgress, Typography } from '@mui/material';
 // Убран import { useNavigate }, так как он закомментирован и не используется
-import { updateDog, fetchDogs } from '../features/dogs/dogsSlice';
+import { updateDog, fetchUserDogs } from '../features/dogs/dogsSlice';
 
 const EditDogForm = () => {
     const [selectedDogId, setSelectedDogId] = useState('');
@@ -17,7 +17,7 @@ const EditDogForm = () => {
     const [breedsList, setBreedsList] = useState([]);
 
     useEffect(() => {
-        dispatch(fetchDogs());
+        dispatch(fetchUserDogs());
         const fetchBreeds = async () => {
             setLoadingBreeds(true);
             try {
@@ -55,7 +55,7 @@ const EditDogForm = () => {
         await dispatch(updateDog({ dogId: selectedDogId, dogData: { name, breed: selectedBreed, age: Number(age) } }));
         setOpenSnackbar(true);
         // После обновления собаки, обновляем список собак в состоянии приложения
-        dispatch(fetchDogs());
+        dispatch(fetchUserDogs());
     };
 
     const handleCloseSnackbar = () => {

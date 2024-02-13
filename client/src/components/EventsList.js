@@ -5,8 +5,7 @@ import { List, ListItem, ListItemText, Divider, Typography } from '@mui/material
 import { format } from 'date-fns';
 
 const EventsList = () => {
-    const events = useSelector((state) => state.events.events);
-
+    const events = useSelector((state) => state.users.userEvents || []); // Предоставление пустого массива по умолчанию
     return (
         <div>
             <Typography variant="h4" gutterBottom>
