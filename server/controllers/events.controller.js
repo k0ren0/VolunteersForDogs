@@ -1,9 +1,34 @@
 import * as EventsModel from '../models/events.model.js';
 
+// // Добавление события
+// export const _addEvent = async (req, res) => {
+//     try {
+//         const { title, description, date, location, volunteer_needed, event_type, start_time, end_time, days_of_week } = req.body;
+//         const user_id = req.user.user_id;
+//         // Обеспечиваем передачу всех необходимых данных для создания события
+//         const newEvent = await EventsModel.createEvent({
+//             title, 
+//             description, 
+//             date, 
+//             location, 
+//             volunteer_needed, 
+//             event_type, 
+//             start_time, 
+//             end_time, 
+//             days_of_week, 
+//             user_id
+//         });
+//         res.status(201).json({ message: 'Event added successfully', event: newEvent });
+//     } catch (error) {
+//         console.error('Error adding event:', error);
+//         res.status(500).json({ error: 'Error adding event' });
+//     }
+// };
+
 // Добавление события
 export const _addEvent = async (req, res) => {
     try {
-        const { title, description, date, location, volunteer_needed, event_type, start_time, end_time, days_of_week } = req.body;
+        const { title, description, date, location, volunteer_needed, event_type, days_of_week } = req.body;
         const user_id = req.user.user_id;
         // Обеспечиваем передачу всех необходимых данных для создания события
         const newEvent = await EventsModel.createEvent({
@@ -13,8 +38,6 @@ export const _addEvent = async (req, res) => {
             location, 
             volunteer_needed, 
             event_type, 
-            start_time, 
-            end_time, 
             days_of_week, 
             user_id
         });

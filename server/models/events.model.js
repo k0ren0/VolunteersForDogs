@@ -1,6 +1,7 @@
 import { db } from '../config/db.js';
 
-export const addEvent = async ({ title, description, date, country, city, volunteer_needed, event_type, start_time, end_time, days_of_week, user_id }) => {
+// export const addEvent = async ({ title, description, date, country, city, volunteer_needed, event_type, start_time, end_time, days_of_week, user_id }) => {
+export const addEvent = async ({ title, description, date, country, city, volunteer_needed, event_type, days_of_week, user_id }) => {
     const [newEvent] = await db('events').insert({
         title,
         description,
@@ -9,8 +10,6 @@ export const addEvent = async ({ title, description, date, country, city, volunt
         city,
         volunteer_needed,
         event_type,
-        start_time,
-        end_time,
         days_of_week,
         user_id
     }).returning('*'); // Возвращает созданное событие
