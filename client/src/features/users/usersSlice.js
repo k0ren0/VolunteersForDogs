@@ -255,13 +255,13 @@ const usersSlice = createSlice({
                 state.events.push(action.payload);
             })
             .addCase(updateEvent.fulfilled, (state, action) => {
-                const index = state.events.findIndex(event => event.id === action.payload.id);
+                const index = state.events.findIndex(event => event.event_id === action.payload.event_id);
                 if (index !== -1) {
                     state.events[index] = action.payload;
                 }
             })
             .addCase(deleteEvent.fulfilled, (state, action) => {
-                state.events = state.events.filter(event => event.id !== action.payload);
+                state.events = state.events.filter(event => event.event_id !== action.payload);
             });
     },
 });

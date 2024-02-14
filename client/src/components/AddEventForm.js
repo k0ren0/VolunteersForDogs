@@ -5,20 +5,20 @@ import { addEvent } from '../features/events/eventsSlice';
 import { fetchUserDogs, selectUserDogs } from '../features/dogs/dogsSlice';
 
 const AddEventForm = ({ updateEventList }) => {
-    const [eventType, setEventType] = useState('customer'); // По умолчанию кастомер
+    const [eventType, setEventType] = useState('customer');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [country, setCountry] = useState('Israel'); // По умолчанию Израиль
+    const [country, setCountry] = useState('Israel');
     const [city, setCity] = useState('');
-    const [volunteerNeeded, setVolunteerNeeded] = useState(1); // По умолчанию 1 волонтер
-    const [startTime, setStartTime] = useState(''); // Только часы, без минут
-    const [endTime, setEndTime] = useState(''); // Только часы, без минут
-    const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState([]); // Выбранные дни недели
-    const [selectedDate, setSelectedDate] = useState(new Date()); // Выбранная дата
-    const [selectedDog, setSelectedDog] = useState(''); // Выбранная собака
+    const [volunteerNeeded, setVolunteerNeeded] = useState(1);
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
+    const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDog, setSelectedDog] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const dispatch = useDispatch();
-    const userDogs = useSelector(selectUserDogs); // Получаем список собак пользователя
+    const userDogs = useSelector(selectUserDogs);
 
     useEffect(() => {
         const loadUserDogs = async () => {
@@ -28,71 +28,69 @@ const AddEventForm = ({ updateEventList }) => {
                 console.error('Error fetching user dogs:', error);
             }
         };
-
         loadUserDogs();
     }, [dispatch]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
+        let eventData = {
+            title,
+            description,
+            event_type: eventType,
+            start_time: startTime + ':00', // Формат сохранен как есть
+            end_time: endTime + ':00', // Формат сохранен как есть
+            date: selectedDate.toISOString(), // Прямое использование ISO строки
+            country,
+            city,
+            volunteer_needed: eventType === 'customer' ? Number(volunteerNeeded) : undefined,
+            days_of_week: eventType === 'volunteer' ? selectedDaysOfWeek.join(',') : undefined, // Условное включение
+            dogId: eventType === 'customer' ? selectedDog : undefined
+        };
+
+        // Удаление полей с undefined значениями перед отправкой
+        eventData = Object.fromEntries(Object.entries(eventData).filter(([_, v]) => v !== undefined));
+
+        console.log('Sending eventData:', eventData);
+
         try {
-            await dispatch(addEvent({
-                title,
-                description,
-                country,
-                city,
-                volunteerNeeded: eventType === 'customer' ? Number(volunteerNeeded) : undefined,
-                eventType,
-                startTime,
-                endTime,
-                daysOfWeek: eventType === 'volunteer' ? selectedDaysOfWeek.join(', ') : undefined,
-                dogId: eventType === 'customer' ? selectedDog : undefined,
-                date: selectedDate.toISOString().split('T')[0] // Преобразование даты в строку в формате YYYY-MM-DD
-            }));
-
-            setTitle('');
-            setDescription('');
-            setCountry('Israel');
-            setCity('');
-            setEventType('customer');
-            setVolunteerNeeded(1);
-            setStartTime('');
-            setEndTime('');
-            setSelectedDaysOfWeek([]);
-            setSelectedDog('');
-            setSelectedDate(new Date());
-
+            await dispatch(addEvent(eventData));
+            resetForm();
             setOpenSnackbar(true);
-
-            updateEventList();
         } catch (error) {
             console.error('Error adding event:', error);
+            setOpenSnackbar(true); // Показываем уведомление об ошибке
         }
     };
 
-    const handleCloseSnackbar = () => {
+    const resetForm = () => {
+        setTitle('');
+        setDescription('');
+        setCountry('Israel');
+        setCity('');
+        setVolunteerNeeded(1);
+        setEventType('customer');
+        setStartTime('');
+        setEndTime('');
+        setSelectedDaysOfWeek([]);
+        setSelectedDate(new Date());
+        setSelectedDog('');
         setOpenSnackbar(false);
     };
 
-    const handleDayChange = (event) => {
-        setSelectedDaysOfWeek(event.target.value);
-    };
+    const handleCloseSnackbar = () => setOpenSnackbar(false);
 
-    const handleDogChange = (event) => {
-        setSelectedDog(event.target.value);
-    };
+    const handleDayChange = (event) => setSelectedDaysOfWeek(typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value);
 
-    const handleDateChange = (date) => {
-        setSelectedDate(date);
-    };
+    const handleDogChange = (event) => setSelectedDog(event.target.value || '');
+
+    const handleDateChange = (date) => setSelectedDate(date);
 
     return (
         <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{
-                '& > :not(style)': { m: 1 }
-            }}
+            sx={{ '& > :not(style)': { m: 1 } }}
             noValidate
             autoComplete="off"
         >
@@ -146,32 +144,24 @@ const AddEventForm = ({ updateEventList }) => {
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 required
-                inputProps={{
-                    step: 3600, // Шаг в секундах (3600 секунд = 1 час)
-                }}
+                inputProps={{ step: 3600 }}
             />
-            {(eventType === 'volunteer' || (eventType === 'customer' && selectedDaysOfWeek.length > 0)) && (
-                <TextField
-                    label="End Time (HH:00)"
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    required
-                    inputProps={{
-                        step: 3600, // Шаг в секундах (3600 секунд = 1 час)
-                    }}
-                />
-            )}
-            {(eventType === 'volunteer' || eventType === 'customer') && (
-                <TextField
-                    label="Date"
-                    type="date"
-                    value={selectedDate.toISOString().split('T')[0]}
-                    onChange={(e) => handleDateChange(new Date(e.target.value))}
-                    required
-                />
-            )}
-            {(eventType === 'volunteer' || (eventType === 'customer' && selectedDaysOfWeek.length > 0)) && (
+            <TextField
+                label="End Time (HH:00)"
+                type="time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                required
+                inputProps={{ step: 3600 }}
+            />
+            <TextField
+                label="Date"
+                type="date"
+                value={selectedDate.toISOString().split('T')[0]}
+                onChange={(e) => handleDateChange(new Date(e.target.value))}
+                required
+            />
+            {eventType === 'volunteer' && (
                 <Select
                     label="Days of Week"
                     multiple
@@ -180,14 +170,13 @@ const AddEventForm = ({ updateEventList }) => {
                     required
                     sx={{ minWidth: '120px' }}
                 >
-                    <MenuItem disabled={!selectedDaysOfWeek.length}>Select Days</MenuItem>
-                    <MenuItem value="Sunday">Sunday</MenuItem>
-                    <MenuItem value="Monday">Monday</MenuItem>
-                    <MenuItem value="Tuesday">Tuesday</MenuItem>
-                    <MenuItem value="Wednesday">Wednesday</MenuItem>
-                    <MenuItem value="Thursday">Thursday</MenuItem>
-                    <MenuItem value="Friday">Friday</MenuItem>
-                    <MenuItem value="Saturday">Saturday</MenuItem>
+                    <MenuItem key="Sunday" value="Sunday">Sunday</MenuItem>
+                    <MenuItem key="Monday" value="Monday">Monday</MenuItem>
+                    <MenuItem key="Tuesday" value="Tuesday">Tuesday</MenuItem>
+                    <MenuItem key="Wednesday" value="Wednesday">Wednesday</MenuItem>
+                    <MenuItem key="Thursday" value="Thursday">Thursday</MenuItem>
+                    <MenuItem key="Friday" value="Friday">Friday</MenuItem>
+                    <MenuItem key="Saturday" value="Saturday">Saturday</MenuItem>
                 </Select>
             )}
             {eventType === 'customer' && (
@@ -199,9 +188,7 @@ const AddEventForm = ({ updateEventList }) => {
                     sx={{ minWidth: '120px' }}
                 >
                     {userDogs.map((dog) => (
-                        <MenuItem key={dog.id} value={dog.id}>
-                            {dog.name}
-                        </MenuItem>
+                        <MenuItem key={dog.dog_id} value={dog.dog_id}>{dog.name}</MenuItem>
                     ))}
                 </Select>
             )}
@@ -217,6 +204,242 @@ const AddEventForm = ({ updateEventList }) => {
 };
 
 export default AddEventForm;
+
+
+//last work
+
+// import React, { useState, useEffect } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { TextField, Button, Box, Snackbar, Select, MenuItem } from '@mui/material';
+// import { addEvent } from '../features/events/eventsSlice';
+// import { fetchUserDogs, selectUserDogs } from '../features/dogs/dogsSlice';
+
+// const AddEventForm = ({ updateEventList }) => {
+//     const [eventType, setEventType] = useState('customer'); 
+//     const [title, setTitle] = useState('');
+//     const [description, setDescription] = useState('');
+//     const [country, setCountry] = useState('Israel'); 
+//     const [city, setCity] = useState('');
+//     const [volunteerNeeded, setVolunteerNeeded] = useState(1); 
+//     const [startTime, setStartTime] = useState(''); 
+//     const [endTime, setEndTime] = useState(''); 
+//     const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState([]); 
+//     const [selectedDate, setSelectedDate] = useState(new Date()); 
+//     const [selectedDog, setSelectedDog] = useState(''); 
+//     const [openSnackbar, setOpenSnackbar] = useState(false);
+//     const dispatch = useDispatch();
+//     const userDogs = useSelector(selectUserDogs); 
+
+//     useEffect(() => {
+//         const loadUserDogs = async () => {
+//             try {
+//                 await dispatch(fetchUserDogs());
+//             } catch (error) {
+//                 console.error('Error fetching user dogs:', error);
+//             }
+//         };
+
+//         loadUserDogs();
+//     }, [dispatch]);
+
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+
+//         const eventData = {
+//             title,
+//             description,
+//             eventType,
+//             startTime,
+//             endTime,
+//             date: selectedDate.toISOString().split('T')[0],
+//             country,
+//             city,
+//             volunteerNeeded: eventType === 'customer' ? Number(volunteerNeeded) : undefined,
+//             daysOfWeek: eventType === 'volunteer' ? selectedDaysOfWeek.join(', ') : undefined,
+//             dogId: eventType === 'customer' ? selectedDog : undefined
+//         };
+
+//         const requiredFields = ['title', 'description', 'eventType', 'startTime', 'endTime'];
+//         const emptyFields = requiredFields.filter(field => !eventData[field]);
+//         if (emptyFields.length > 0) {
+//             console.error('Empty fields:', emptyFields);
+//             alert(`Please fill in the following fields: ${emptyFields.join(', ')}`);
+//             return;
+//         }
+
+//         try {
+//             await dispatch(addEvent(eventData));
+
+//             setTitle('');
+//             setDescription('');
+//             setCountry('Israel');
+//             setCity('');
+//             setVolunteerNeeded(1);
+//             setEventType('customer');
+//             setStartTime('');
+//             setEndTime('');
+//             setSelectedDaysOfWeek([]);
+//             setSelectedDog('');
+//             setSelectedDate(new Date());
+
+//             setOpenSnackbar(true);
+
+//             if (updateEventList) {
+//                 updateEventList();
+//             }
+//         } catch (error) {
+//             console.error('Error adding event:', error);
+//         }
+//     };
+
+//     const handleCloseSnackbar = () => {
+//         setOpenSnackbar(false);
+//     };
+
+//     const handleDayChange = (event) => {
+//         setSelectedDaysOfWeek(event.target.value);
+//     };
+
+//     const handleDogChange = (event) => {
+//         setSelectedDog(event.target.value || ''); 
+//     };
+
+//     const handleDateChange = (date) => {
+//         setSelectedDate(date);
+//     };
+
+//     return (
+//         <Box
+//             component="form"
+//             onSubmit={handleSubmit}
+//             sx={{
+//                 '& > :not(style)': { m: 1 }
+//             }}
+//             noValidate
+//             autoComplete="off"
+//         >
+//             <Select
+//                 label="Event Type"
+//                 value={eventType}
+//                 onChange={(e) => setEventType(e.target.value)}
+//                 required
+//             >
+//                 <MenuItem value="volunteer">Volunteer</MenuItem>
+//                 <MenuItem value="customer">Customer</MenuItem>
+//             </Select>
+//             <TextField
+//                 label="Title"
+//                 value={title}
+//                 onChange={(e) => setTitle(e.target.value)}
+//                 required
+//             />
+//             <TextField
+//                 label="Description"
+//                 value={description}
+//                 onChange={(e) => setDescription(e.target.value)}
+//                 required
+//             />
+//             {eventType === 'customer' && (
+//                 <>
+//                     <TextField
+//                         label="Country"
+//                         value={country}
+//                         onChange={(e) => setCountry(e.target.value)}
+//                         required
+//                     />
+//                     <TextField
+//                         label="City"
+//                         value={city}
+//                         onChange={(e) => setCity(e.target.value)}
+//                         required
+//                     />
+//                     <TextField
+//                         label="Volunteers Needed"
+//                         type="number"
+//                         value={volunteerNeeded}
+//                         onChange={(e) => setVolunteerNeeded(e.target.value)}
+//                         required
+//                     />
+//                 </>
+//             )}
+//             <TextField
+//                 label="Start Time (HH:00)"
+//                 type="time"
+//                 value={startTime}
+//                 onChange={(e) => setStartTime(e.target.value)}
+//                 required
+//                 inputProps={{
+//                     step: 3600, 
+//                 }}
+//             />
+//             <TextField
+//                 label="End Time (HH:00)"
+//                 type="time"
+//                 value={endTime}
+//                 onChange={(e) => setEndTime(e.target.value)}
+//                 required
+//                 inputProps={{
+//                     step: 3600, 
+//                 }}
+//             />
+//             {(eventType === 'volunteer' || (eventType === 'customer' && selectedDaysOfWeek.length > 0)) && (
+//                 <TextField
+//                     label="Date"
+//                     type="date"
+//                     value={selectedDate.toISOString().split('T')[0]}
+//                     onChange={(e) => handleDateChange(new Date(e.target.value))}
+//                     required
+//                 />
+//             )}
+//             {(eventType === 'volunteer' || (eventType === 'customer' && selectedDaysOfWeek.length > 0)) && (
+//                 <Select
+//                     label="Days of Week"
+//                     multiple
+//                     value={selectedDaysOfWeek}
+//                     onChange={handleDayChange}
+//                     required
+//                     sx={{ minWidth: '120px' }}
+//                 >
+//                     <MenuItem disabled={!selectedDaysOfWeek.length}>Select Days</MenuItem>
+//                     <MenuItem key="Sunday" value="Sunday">Sunday</MenuItem>
+//                     <MenuItem key="Monday" value="Monday">Monday</MenuItem>
+//                     <MenuItem key="Tuesday" value="Tuesday">Tuesday</MenuItem>
+//                     <MenuItem key="Wednesday" value="Wednesday">Wednesday</MenuItem>
+//                     <MenuItem key="Thursday" value="Thursday">Thursday</MenuItem>
+//                     <MenuItem key="Friday" value="Friday">Friday</MenuItem>
+//                     <MenuItem key="Saturday" value="Saturday">Saturday</MenuItem>
+//                 </Select>
+//             )}
+//             {eventType === 'customer' && (
+//                 <Select
+//                     label="Dog"
+//                     value={selectedDog}
+//                     onChange={handleDogChange}
+//                     required
+//                     sx={{ minWidth: '120px' }}
+//                 >
+//                     {userDogs.map((dog) => (
+//                         <MenuItem key={dog.dog_id} value={dog.dog_id}>
+//                             {dog.name}
+//                         </MenuItem>
+//                     ))}
+//                 </Select>
+//             )}
+//             <Button type="submit" variant="contained">Add Event</Button>
+//             <Snackbar
+//                 open={openSnackbar}
+//                 autoHideDuration={6000}
+//                 onClose={handleCloseSnackbar}
+//                 message="Event added successfully"
+//             />
+//         </Box>
+//     );
+// };
+
+// export default AddEventForm;
+
+
+
 
 
 
