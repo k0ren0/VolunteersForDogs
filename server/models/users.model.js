@@ -10,6 +10,16 @@ export const register = (email, password) => {
         });
 };
 
+export const checkEmailExists = (email) => {
+    return db("users").where({ email }).first().then(user => {
+        return user ? true : false;
+    }).catch((error) => {
+        console.error("Error checking email existence:", error);
+        throw new Error("Failed to check email existence");
+    });
+};
+
+
 export const login = (email) => {
     return db("users").select("email", "password", "user_id").where({ email }).first();
 };

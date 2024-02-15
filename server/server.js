@@ -32,6 +32,7 @@ app.get('/api/verifytoken', verifytoken, (req, res) => {
   res.status(200).json({ message: 'Token is valid' });
 });
 
+
 app.use('/users', usersRouter);
 app.use('/events', eventsRouter);
 app.use('/dogs', dogsRouter);
