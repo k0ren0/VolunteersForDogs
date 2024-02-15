@@ -23,18 +23,19 @@ export const _login = async (req, res) => {
 
         const token = jwt.sign({ user_id }, secret, { expiresIn: '1h' });
 
+        const userResponse = { user_id: user.user_id, email: user.email, /* другие безопасные данные пользователя */ };
+
         res.cookie("token", token, {
             maxAge: 3600 * 1000, // 1 hour
             httpOnly: true,
         });
 
-        res.json({ token });
+        res.json({ token, user: userResponse });
     } catch (error) {
         console.log("_login =>", error);
         res.status(500).json({ msg: "Something went wrong!!!" });
     }
 };
-
 export const _register = async (req, res) => {
     const { email, password } = req.body;
     const lowerEmail = email.toLowerCase();

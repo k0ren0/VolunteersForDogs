@@ -13,8 +13,8 @@ function Events() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { token } = useSelector(state => state.auth);
-  const userDogs = useSelector(state => state.dogs.userDogs);
   const { events, status, error } = useSelector(state => state.events);
+  const userDogs = useSelector(state => state.dogs.userDogs); // Добавлено получение списка собак пользователя
 
   const [filter, setFilter] = useState({
     title: '',
@@ -32,6 +32,8 @@ function Events() {
       navigate('/login');
     }
   }, [dispatch, navigate, token, filter]);
+
+  console.log(userDogs); 
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -82,30 +84,37 @@ function Events() {
                 <TableCell>City</TableCell>
                 <TableCell>Date</TableCell>
                 <TableCell>Type</TableCell>
-                <TableCell>Dog Breed</TableCell>
+                <TableCell>Dog Breed</TableCell> {/* Добавляем столбец для породы собаки */}
                 <TableCell>Day of Week</TableCell>
+                <TableCell>Dog ID</TableCell> {/* Добавляем столбец для идентификатора собаки */}
               </TableRow>
             </TableHead>
             <TableBody>
-              {events.map(event => (
+              {events.map((event) => (
                 <TableRow key={event.event_id}>
                   <TableCell>{event.title}</TableCell>
                   <TableCell>{event.city}</TableCell>
                   <TableCell>{moment(event.date).format('YYYY-MM-DD')}</TableCell>
                   <TableCell>{event.event_type}</TableCell>
-                  <TableCell>{event.dogBreed}</TableCell>
+                  <TableCell>{event.dogId}</TableCell>
                   <TableCell>{event.day_of_week}</TableCell>
+                  <TableCell>
+                    {/* {userDogs && userDogs.some(dog => dog.user_id === event.user_id) ? userDogs.find(dog => dog.user_id === event.user_id).user_id : '-'} */}
+                    {event.dog_id ? event.dog_id : '-'}
+                  </TableCell> {/* Проверка наличия собаки пользователя и отображение ее идентификатора */}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       )}
+
     </Box>
   );
 }
 
 export default Events;
+
 
 
 //LAST поменять и рассмотреть создание dog_id в ивентах
