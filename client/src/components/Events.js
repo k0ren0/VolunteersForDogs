@@ -7,6 +7,7 @@ import {
   TextField, Button, Typography, CircularProgress, Box, Table,
   TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
+import moment from 'moment'; // Импорт библиотеки moment для форматирования даты
 
 function Events() {
   const dispatch = useDispatch();
@@ -90,7 +91,7 @@ function Events() {
                 <TableRow key={event.event_id}>
                   <TableCell>{event.title}</TableCell>
                   <TableCell>{event.city}</TableCell>
-                  <TableCell>{event.date}</TableCell>
+                  <TableCell>{moment(event.date).format('YYYY-MM-DD')}</TableCell>
                   <TableCell>{event.event_type}</TableCell>
                   <TableCell>{event.dogBreed}</TableCell>
                   <TableCell>{event.day_of_week}</TableCell>
