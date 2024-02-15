@@ -4,6 +4,7 @@ import { verifytoken } from "../middleware/verifyToken.js";
 import { db } from "../config/db.js";
 import moment from 'moment';
 
+
 const router = express.Router();
 
 // Функция логирования для отслеживания приходящих запросов
@@ -28,7 +29,8 @@ const eventValidationRules = [
     // body('end_time').optional(),
     body('days_of_week').optional().isString().withMessage('Days of the week must be a string')
     .matches(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)(,(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday))*$/)
-    .withMessage('Invalid value for days of the week')
+    .withMessage('Invalid value for days of the week'),
+    body('dog_id').optional().isNumeric().withMessage('Dog ID must be numeric'),
 ];
 
 router.post('/', verifytoken, eventValidationRules, async (req, res) => {
@@ -38,13 +40,15 @@ router.post('/', verifytoken, eventValidationRules, async (req, res) => {
     }
 
     try {
-        const { title, description, date, country, city, volunteer_needed, event_type, days_of_week, location, start_time, end_time } = req.body;
+        const { title, description, date, country, city, volunteer_needed, event_type, days_of_week, location, start_time, end_time, dog_id } = req.body;
         const user_id = req.user.user_id; // Предполагается, что это значение вы устанавливаете из токена или сессии
 
         // Нет необходимости заново декларировать переменные, которые уже были объявлены выше
         const eventData = {
-            user_id, title, description, date, country, city, volunteer_needed, event_type, days_of_week, location, start_time, end_time
+            user_id, title, description, date, country, city, volunteer_needed, event_type, days_of_week, location, start_time, end_time 
         };
+
+        if (dog_id) eventData.dog_id = dog_id;
 
         await db('events').insert(eventData);
         res.status(201).json({ message: 'Event added successfully' });
@@ -53,6 +57,24 @@ router.post('/', verifytoken, eventValidationRules, async (req, res) => {
         res.status(500).json({ error: 'Error saving event' });
     }
 });
+
+// router.post('/', verifytoken, eventValidationRules, async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     try {
+//         const eventData = { ...req.body, user_id: req.user.user_id };
+//         const newEvent = await addEvent(eventData);
+//         res.status(201).json({ message: 'Event added successfully', event: newEvent });
+//     } catch (error) {
+//         console.error('Error adding event:', error);
+//         res.status(500).json({ error: 'Error adding event' });
+//     }
+// });
+
+
 
 router.put('/:event_id', verifytoken, eventValidationRules, async (req, res) => {
     const errors = validationResult(req);

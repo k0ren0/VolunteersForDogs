@@ -105,8 +105,13 @@ const dogsSlice = createSlice({
             })
             .addCase(fetchUserDogs.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.dogs = action.payload;
+                // Прямо используем полученные данные о собаках для обновления состояния
+                state.dogs = action.payload.map(dog => ({
+                    ...dog,
+                    breedInfo: { breed: dog.breed } // Имитация структуры данных для информации о породе
+                }));
             })
+            
             .addCase(fetchUserDogs.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;

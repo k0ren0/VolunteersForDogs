@@ -1,20 +1,29 @@
 import { db } from '../config/db.js';
 
 // export const addEvent = async ({ title, description, date, country, city, volunteer_needed, event_type, start_time, end_time, days_of_week, user_id }) => {
-export const addEvent = async ({ title, description, date, country, city, volunteer_needed, event_type, days_of_week, user_id }) => {
+export const addEvent = async ({ title, description, date, location, volunteer_needed, event_type, days_of_week, user_id, dog_id }) => {
     const [newEvent] = await db('events').insert({
         title,
         description,
         date,
-        country,
-        city,
+        location,
         volunteer_needed,
         event_type,
         days_of_week,
-        user_id
-    }).returning('*'); // Возвращает созданное событие
+        user_id,
+        dog_id // Убедитесь, что этот параметр включен в запрос к базе данных
+    }).returning('*');
     return newEvent;
 };
+
+// export const addEvent = async (eventData) => {
+//     const [newEvent] = await db('events').insert(eventData).returning('*');
+//     return newEvent;
+// };
+
+
+console.log('Adding event with data:', req.body);
+
 
 export const getAllEvents = async () => {
     return await db.select('*').from('events');
@@ -35,7 +44,7 @@ export const deleteEvent = async (event_id) => {
 };
 
 
-
+export default EventsModel;
 
 
 // import { db } from '../config/db.js';

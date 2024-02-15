@@ -24,19 +24,22 @@ const AddEventForm = ({ updateEventList }) => {
         dispatch(fetchUserDogs());
     }, [dispatch]);
 
-
     const handleDogChange = (event) => {
-        const selectedDogId = event.target.value || '';
-        // Find the dog object based on the selected ID
-        const selectedDog = userDogs.find(dog => dog.dog_id === selectedDogId);
-        if (selectedDog) {
-            // If the dog is found, set its ID to selectedDog
-            setSelectedDog(selectedDog.dog_id);
-        } else {
-            // If the dog is not found, reset selectedDog
-            setSelectedDog('');
-        }
+        setSelectedDog(event.target.value); 
     };
+    
+    // const handleDogChange = (event) => {
+    //     const selectedDogId = event.target.value || '';
+    //     // Find the dog object based on the selected ID
+    //     const selectedDog = userDogs.find(dog => dog.dog_id === selectedDogId);
+    //     if (selectedDog) {
+    //         // If the dog is found, set its ID to selectedDog
+    //         setSelectedDog(selectedDog.dog_id);
+    //     } else {
+    //         // If the dog is not found, reset selectedDog
+    //         setSelectedDog('');
+    //     }
+    // };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -138,6 +141,209 @@ const AddEventForm = ({ updateEventList }) => {
 };
 
 export default AddEventForm;
+
+
+
+
+////
+
+
+//new but dont' work
+
+/////
+
+
+// import React, { useState, useEffect } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { TextField, Button, Box, Snackbar, FormControl, InputLabel, Select, MenuItem, Input, Chip } from '@mui/material';
+// import { addEvent } from '../features/events/eventsSlice';
+// import { fetchUserDogs, selectUserDogs } from '../features/dogs/dogsSlice';
+// import moment from 'moment';
+
+// const ITEM_HEIGHT = 48;
+// const ITEM_PADDING_TOP = 8;
+// const MenuProps = {
+//   PaperProps: {
+//     style: {
+//       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+//       width: 250,
+//     },
+//   },
+// };
+
+// const daysOfWeek = [
+//   'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+// ];
+
+// const AddEventForm = ({ updateEventList }) => {
+//     const dispatch = useDispatch();
+//     const userDogs = useSelector(selectUserDogs);
+
+//     const [eventType, setEventType] = useState('');
+//     const [title, setTitle] = useState('');
+//     const [description, setDescription] = useState('');
+//     const [country, setCountry] = useState('');
+//     const [city, setCity] = useState('');
+//     const [volunteerNeeded, setVolunteerNeeded] = useState('');
+//     const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState([]);
+//     const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
+//     const [selectedDog, setSelectedDog] = useState('');
+//     const [openSnackbar, setOpenSnackbar] = useState(false);
+//     const [snackbarMessage, setSnackbarMessage] = useState('');
+
+//     useEffect(() => {
+//         dispatch(fetchUserDogs());
+//     }, [dispatch]);
+
+//     const handleDogChange = (event) => {
+//         setSelectedDog(event.target.value);
+//     };
+
+//     const handleDayChange = (event) => {
+//         const value = event.target.value;
+//         setSelectedDaysOfWeek(typeof value === 'string' ? value.split(',') : value);
+//     };
+
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+
+//     const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+       
+
+//         const eventData = {
+//             title,
+//             description,
+//             event_type: eventType,
+//             date: formattedDate,
+//             country,
+//             city,
+//             days_of_week: selectedDaysOfWeek.join(','),
+//             dog_id: eventType === 'customer' ? selectedDog : undefined
+//         };
+
+//         // if (eventType === 'customer' && selectedDog) {
+//         //     eventData.dog_id = selectedDog;
+//         // }
+//         // console.log('Selected Dog ID:', selectedDog);
+
+
+//         console.log('Sending event data:', eventData);
+
+//         try {
+//             await dispatch(addEvent(eventData));
+//             resetForm();
+//             setSnackbarMessage('Event added successfully.');
+//             setOpenSnackbar(true);
+//             if (updateEventList) updateEventList();
+//         } catch (error) {
+//             console.error('Error adding event:', error);
+//             setSnackbarMessage('Error adding event.');
+//             setOpenSnackbar(true);
+//         }
+//     };
+
+//     const resetForm = () => {
+//         setTitle('');
+//         setDescription('');
+//         setCountry('');
+//         setCity('');
+//         setVolunteerNeeded('');
+//         setEventType('');
+//         setSelectedDaysOfWeek([]);
+//         setSelectedDate(moment().format('YYYY-MM-DD'));
+//         setSelectedDog('');
+//     };
+
+//     const handleCloseSnackbar = () => setOpenSnackbar(false);
+
+//     const handleDateChange = (event) => {
+//         setSelectedDate(event.target.value);
+//     };
+
+//     return (
+//         <Box component="form" onSubmit={handleSubmit} sx={{ '& > :not(style)': { m: 1 } }} noValidate autoComplete="off">
+//             <FormControl fullWidth margin="normal">
+//                 <InputLabel>Event Type</InputLabel>
+//                 <Select
+//                     value={eventType}
+//                     onChange={(e) => setEventType(e.target.value)}
+//                     required
+//                 >
+//                     <MenuItem value="volunteer">Volunteer</MenuItem>
+//                     <MenuItem value="customer">Customer</MenuItem>
+//                 </Select>
+//             </FormControl>
+//             <TextField label="Title" fullWidth margin="normal" value={title} onChange={(e) => setTitle(e.target.value)} required />
+//             <TextField label="Description" fullWidth margin="normal" value={description} onChange={(e) => setDescription(e.target.value)} required />
+//             <TextField label="Country" fullWidth margin="normal" value={country} onChange={(e) => setCountry(e.target.value)} required />
+//             <TextField label="City" fullWidth margin="normal" value={city} onChange={(e) => setCity(e.target.value)} required />
+//             <TextField label="Date" type="date" fullWidth margin="normal" value={selectedDate} onChange={handleDateChange} required InputLabelProps={{ shrink: true }} />
+            
+//             <FormControl fullWidth margin="normal">
+//                 <InputLabel>Days of Week</InputLabel>
+//                 <Select
+//                     multiple
+//                     value={selectedDaysOfWeek}
+//                     onChange={handleDayChange}
+//                     input={<Input />}
+//                     renderValue={(selected) => (
+//                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+//                             {selected.map((day) => (
+//                                 <Chip key={day} label={day} />
+//                             ))}
+//                         </Box>
+//                     )}
+//                     MenuProps={MenuProps}
+//                 >
+//                     {daysOfWeek.map((day) => (
+//                         <MenuItem key={day} value={day}>
+//                             {day}
+//                         </MenuItem>
+//                     ))}
+//                 </Select>
+//             </FormControl>
+
+//             {eventType === 'customer' && (
+//                 <>
+//                     <TextField
+//                         label="Volunteers Needed"
+//                         type="number"
+//                         fullWidth
+//                         margin="normal"
+//                         value={volunteerNeeded}
+//                         onChange={(e) => setVolunteerNeeded(e.target.value)}
+//                         defaultValue="1" // Default value for customer
+//                         required
+//                     />
+
+//                     <FormControl fullWidth margin="normal">
+//                         <InputLabel>Dog</InputLabel>
+//                         <Select
+//                             value={selectedDog}
+//                             onChange={handleDogChange}
+//                             displayEmpty
+//                         >
+//                             <MenuItem value="">None (Optional)</MenuItem>
+//                             {userDogs.map((dog) => (
+//                                 <MenuItem key={dog.dog_id} value={dog.dog_id}>{dog.name}</MenuItem>
+//                             ))}
+//                         </Select>
+//                     </FormControl>
+//                 </>
+//             )}
+
+//             <Button type="submit" variant="contained" sx={{ mt: 2 }}>Add Event</Button>
+//             <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar} message={snackbarMessage} />
+//         </Box>
+//     );
+// };
+
+// export default AddEventForm;
+
+
+
+
+
 
 
 //////before
