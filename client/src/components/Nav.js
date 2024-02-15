@@ -48,7 +48,7 @@ const Nav = () => {
             </IconButton>
           )}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            App Name
+            Volunteer App
           </Typography>
           {!isMobile && links.filter(link => !link.hidden).map((link, index) => (
             <Button

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSelector, createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -16,7 +16,7 @@ const getToken = (getState) => {
     return token;
 };
 
-export const fetchDogs = createAsyncThunk('dogs/fetchDogs', async (_, { getState, rejectWithValue }) => {
+export const fetchUserDogs = createAsyncThunk('dogs/fetchUserDogs', async (_, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     if (!token) return rejectWithValue('Token not found');
     try {
@@ -68,6 +68,28 @@ export const updateDog = createAsyncThunk('dogs/updateDog', async ({ dogId, dogD
     }
 });
 
+const selectDogsState = state => state.dogs;
+const selectAuthState = state => state.auth;
+
+export const selectUserDogs = createSelector(
+    [selectDogsState, selectAuthState],
+    (dogsState, authState) => {
+        console.log('Dogs state:', dogsState);
+        console.log('Auth state:', authState);
+        const user_id = authState ? authState.user_id : null; // Проверяем наличие объекта authState
+        if (user_id && dogsState.dogs) {
+            // Фильтруем собак по user_id
+            return dogsState.dogs.filter(dog => dog.user_id === user_id).map(dog => ({
+                dog_id: dog.dog_id,
+                name: dog.name,
+                breed: dog.breed
+            }));
+        } else {
+            return [];
+        }
+    }
+);
+
 const dogsSlice = createSlice({
     name: 'dogs',
     initialState: {
@@ -78,14 +100,19 @@ const dogsSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(fetchDogs.pending, (state) => {
+            .addCase(fetchUserDogs.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(fetchDogs.fulfilled, (state, action) => {
+            .addCase(fetchUserDogs.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.dogs = action.payload;
+                // Прямо используем полученные данные о собаках для обновления состояния
+                state.dogs = action.payload.map(dog => ({
+                    ...dog,
+                    breedInfo: { breed: dog.breed } // Имитация структуры данных для информации о породе
+                }));
             })
-            .addCase(fetchDogs.rejected, (state, action) => {
+            
+            .addCase(fetchUserDogs.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             })
@@ -109,9 +136,7 @@ export default dogsSlice.reducer;
 
 
 
-// // dogsSlice.js
-
-// import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+// import { createSelector, createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // import axios from 'axios';
 
 // const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -129,7 +154,7 @@ export default dogsSlice.reducer;
 //     return token;
 // };
 
-// export const fetchDogs = createAsyncThunk('dogs/fetchDogs', async (_, { getState, rejectWithValue }) => {
+// export const fetchUserDogs = createAsyncThunk('dogs/fetchUserDogs', async (_, { getState, rejectWithValue }) => {
 //     const token = getToken(getState);
 //     if (!token) return rejectWithValue('Token not found');
 //     try {
@@ -155,6 +180,79 @@ export default dogsSlice.reducer;
 //     }
 // });
 
+// export const deleteDog = createAsyncThunk('dogs/deleteDog', async (dogId, { getState, rejectWithValue }) => {
+//     const token = getToken(getState);
+//     if (!token) return rejectWithValue('Token not found');
+//     try {
+//         await axiosInstance.delete(`/dogs/${dogId}`, {
+//             headers: { 'Authorization': `Bearer ${token}` },
+//         });
+//         return dogId;
+//     } catch (error) {
+//         return rejectWithValue(error.response.data);
+//     }
+// });
+
+// export const updateDog = createAsyncThunk('dogs/updateDog', async ({ dogId, dogData }, { getState, rejectWithValue }) => {
+//     const token = getToken(getState);
+//     if (!token) return rejectWithValue('Token not found');
+//     try {
+//         const response = await axiosInstance.put(`/dogs/${dogId}`, dogData, {
+//             headers: { 'Authorization': `Bearer ${token}` },
+//         });
+//         return response.data;
+//     } catch (error) {
+//         return rejectWithValue(error.response.data);
+//     }
+// });
+
+// const selectDogsState = state => state.dogs;
+// const selectAuthState = state => state.auth;
+
+// export const selectUserDogs = createSelector(
+//     [selectDogsState, selectAuthState],
+//     (dogsState, authState) => {
+//         console.log('Dogs state:', dogsState);
+//         console.log('Auth state:', authState);
+//         const user_id = authState ? authState.user_id : null; // Проверяем наличие объекта authState
+//         if (user_id && dogsState.dogs) {
+//             // Фильтруем собак по user_id
+//             return dogsState.dogs.filter(dog => dog.user_id === user_id).map(dog => ({
+//                 dog_id: dog.dog_id,
+//                 name: dog.name,
+//                 breed: dog.breed
+//             }));
+//         } else {
+//             return [];
+//         }
+//     }
+// );
+
+
+
+// // export const selectUserDogs = createSelector(
+// //     [selectDogsState, selectAuthState],
+// //     (dogsState, authState) => {
+// //         console.log('Dogs state:', dogsState);
+// //         console.log('Auth state:', authState);
+// //         const user_id = authState ? authState.user_id : null; // Добавляем проверку наличия ключа auth
+// //         if (dogsState.dogs && user_id) {
+// //             // Фильтруем собак по user_id
+// //             return dogsState.dogs.filter(dog => dog.user_id === user_id).map(dog => ({
+// //                 dog_id: dog.dog_id,
+// //                 name: dog.name,
+// //                 breed: dog.breed
+// //             }));
+// //         } else {
+// //             return [];
+// //         }
+// //     }
+// // );
+
+
+
+
+
 // const dogsSlice = createSlice({
 //     name: 'dogs',
 //     initialState: {
@@ -165,24 +263,30 @@ export default dogsSlice.reducer;
 //     reducers: {},
 //     extraReducers: (builder) => {
 //         builder
-//             .addCase(fetchDogs.pending, (state) => {
+//             .addCase(fetchUserDogs.pending, (state) => {
 //                 state.status = 'loading';
 //             })
-//             .addCase(fetchDogs.fulfilled, (state, action) => {
+//             .addCase(fetchUserDogs.fulfilled, (state, action) => {
 //                 state.status = 'succeeded';
 //                 state.dogs = action.payload;
 //             })
-//             .addCase(fetchDogs.rejected, (state, action) => {
+//             .addCase(fetchUserDogs.rejected, (state, action) => {
 //                 state.status = 'failed';
 //                 state.error = action.error.message;
 //             })
 //             .addCase(addDog.fulfilled, (state, action) => {
 //                 state.dogs.push(action.payload);
+//             })
+//             .addCase(deleteDog.fulfilled, (state, action) => {
+//                 state.dogs = state.dogs.filter(dog => dog.dog_id !== action.payload);
+//             })
+//             .addCase(updateDog.fulfilled, (state, action) => {
+//                 const index = state.dogs.findIndex(dog => dog.dog_id === action.payload.dog_id);
+//                 if (index !== -1) {
+//                     state.dogs[index] = action.payload;
+//                 }
 //             });
 //     },
 // });
 
 // export default dogsSlice.reducer;
-
-
-
