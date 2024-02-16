@@ -16,12 +16,26 @@ const getToken = (getState) => {
     return token;
 };
 
-export const fetchEvents = createAsyncThunk('events/fetchEvents', async (_, { rejectWithValue }) => {
+// export const fetchEvents = createAsyncThunk('events/fetchEvents', async (_, { rejectWithValue }) => {
+//     try {
+//         const response = await axiosInstance.get('/events');
+//         return response.data;
+//     } catch (error) {
+//         return rejectWithValue(error.response?.data?.error || error.message);
+//     }
+// });
+
+export const fetchEvents = createAsyncThunk('events/fetchEvents', async (_, { getState, rejectWithValue }) => {
+    const token = getToken(getState);
+    if (!token) return rejectWithValue('Token not found');
+    
     try {
-        const response = await axiosInstance.get('/events');
+        const response = await axiosInstance.get(`/events`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
         return response.data;
     } catch (error) {
-        return rejectWithValue(error.response?.data?.error || error.message);
+        return rejectWithValue(error.toString());
     }
 });
 
@@ -81,10 +95,10 @@ export const updateEvent = createAsyncThunk('events/updateEvent', async ({ event
     const token = getToken(getState);
     if (!token) return rejectWithValue('Token not found');
     try {
-        const response = await axiosInstance.put(`/events/${event_id}`, eventData, {
+        await axiosInstance.update(`/events/${event_id}`, eventData, {
             headers: { 'Authorization': `Bearer ${token}` },
         });
-        return response.data;
+        return eventData;
     } catch (error) {
         return rejectWithValue(error.response.data);
     }
