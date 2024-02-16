@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button } from '@mui/material';
+import { TextField, Button, Grid, Container } from '@mui/material';
 
 const UserProfileForm = ({ userData, onUpdate }) => {
   const [email, setEmail] = useState(userData.email || '');
@@ -14,42 +14,61 @@ const UserProfileForm = ({ userData, onUpdate }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <TextField
-        label="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        fullWidth
-      />
-      <TextField
-        label="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        fullWidth
-      />
-      <TextField
-        label="First Name"
-        value={firstName}
-        onChange={(e) => setFirstName(e.target.value)}
-        fullWidth
-      />
-      <TextField
-        label="Last Name"
-        value={lastName}
-        onChange={(e) => setLastName(e.target.value)}
-        fullWidth
-      />
-      <TextField
-        label="Date of Birth"
-        type="date"
-        value={dateOfBirth}
-        onChange={(e) => setDateOfBirth(e.target.value)}
-        fullWidth
-      />
-      <Button type="submit" variant="contained" color="primary">
-        Update
-      </Button>
-    </form>
+    <Container maxWidth="sm">
+      <form onSubmit={handleSubmit}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <TextField
+              label="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Date of Birth"
+              type="date"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              Update
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
+    </Container>
   );
 };
 
