@@ -10,7 +10,7 @@ import UserProfileForm from './UserProfileForm';
 // import AddDogForm from './AddDogForm';
 import AddEventForm from './AddEventForm';
 import EventsList from './EventsList';
-// import EditEventForm from './EditEventForm';
+import EditEventForm from './EditEventForm';
 
 function Profile() {
   const dispatch = useDispatch();
@@ -99,10 +99,10 @@ function Profile() {
         {selectedTab === 2 && (
           <Box mt={2}>
             <Typography variant="h5" gutterBottom>My Events</Typography>
-            <EventsList />
-            {/* <EditEventForm /> */}
             <AddEventForm />
-          </Box>
+            <EventsList />
+            <EditEventForm />
+            </Box>
         )}
 
         <CustomModal isOpen={isModalOpen} message={modalMessage} onRequestClose={closeModal} />
