@@ -99,10 +99,10 @@ function Profile() {
         {selectedTab === 2 && (
           <Box mt={2}>
             <Typography variant="h5" gutterBottom>My Events</Typography>
+            <AddEventForm />
             <EventsList />
             {/* <EditEventForm /> */}
-            <AddEventForm />
-          </Box>
+            </Box>
         )}
 
         <CustomModal isOpen={isModalOpen} message={modalMessage} onRequestClose={closeModal} />

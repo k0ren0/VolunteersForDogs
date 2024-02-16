@@ -1,69 +1,38 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { TextField, Button, Box, Snackbar, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
-import { updateEvent } from '../features/events/eventsSlice';
+import { updateDog, fetchUserDogs } from '../features/dogs/dogsSlice';
 
-const daysOfWeekOptions = [
-    { value: 'Sunday', label: 'Sunday' },
-    { value: 'Monday', label: 'Monday' },
-    { value: 'Tuesday', label: 'Tuesday' },
-    { value: 'Wednesday', label: 'Wednesday' },
-    { value: 'Thursday', label: 'Thursday' },
-    { value: 'Friday', label: 'Friday' },
-    { value: 'Saturday', label: 'Saturday' },
-];
-
-const EditEventForm = ({ events, updateEventList }) => {
-    const [selectedEventId, setSelectedEventId] = useState('');
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [date, setDate] = useState('');
-    const [country, setCountry] = useState('Israel');
-    const [city, setCity] = useState('');
-    const [volunteerNeeded, setVolunteerNeeded] = useState('');
-    const [eventType, setEventType] = useState('');
-    const [startTime, setStartTime] = useState('');
-    const [endTime, setEndTime] = useState('');
-    const [daysOfWeek, setDaysOfWeek] = useState([]);
+const EditDogForm = ({ updateDogList }) => {
+    const [selectedDogId, setSelectedDogId] = useState('');
+    const [name, setName] = useState('');
+    const [selectedBreed, setSelectedBreed] = useState('');
+    const [age, setAge] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const dispatch = useDispatch();
+    const dogs = useSelector((state) => state.dogs.dogs); 
 
-    const handleEventChange = (eventId) => {
-        const selectedEvent = events.find(event => event.event_id === eventId);
-        setSelectedEventId(eventId);
-        setTitle(selectedEvent.title || '');
-        setDescription(selectedEvent.description || '');
-        setDate(selectedEvent.date || '');
-        setCountry(selectedEvent.country || 'Israel');
-        setCity(selectedEvent.city || '');
-        setVolunteerNeeded(selectedEvent.volunteerNeeded || '');
-        setEventType(selectedEvent.eventType || '');
-        setStartTime(selectedEvent.startTime || '');
-        setEndTime(selectedEvent.endTime || '');
-        setDaysOfWeek(selectedEvent.daysOfWeek ? selectedEvent.daysOfWeek.split(', ') : []);
-    };
+    useEffect(() => {
+        if (selectedDogId) {
+            const dog = dogs.find(dog => dog.dog_id && dog.dog_id.toString() === selectedDogId);
+            if (dog) {
+                setName(dog.name || '');
+                setSelectedBreed(dog.breed || '');
+                setAge(typeof dog.age === 'number' ? dog.age.toString() : '');
+            } else {
+                setName('');
+                setSelectedBreed('');
+                setAge('');
+            }
+        }
+    }, [selectedDogId, dogs]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            await dispatch(updateEvent({ 
-                id: selectedEventId,
-                title, 
-                description, 
-                date, 
-                country, 
-                city, 
-                volunteerNeeded: Number(volunteerNeeded),
-                eventType, 
-                startTime, 
-                endTime, 
-                daysOfWeek: daysOfWeek.join(', ')
-            }));
-            setOpenSnackbar(true);
-            updateEventList();
-        } catch (error) {
-            console.error('Error updating event:', error);
-        }
+        await dispatch(updateDog({ dogId: selectedDogId, dogData: { name, breed: selectedBreed, age: Number(age) } }));
+        setOpenSnackbar(true);
+        dispatch(fetchUserDogs());
+        updateDogList();
     };
 
     const handleCloseSnackbar = () => {
@@ -81,124 +50,57 @@ const EditEventForm = ({ events, updateEventList }) => {
             autoComplete="off"
         >
             <FormControl>
-                <InputLabel id="event-select-label">Select Event</InputLabel>
+                <InputLabel id="dog-select-label">Select Dog</InputLabel>
                 <Select
-                    labelId="event-select-label"
-                    value={selectedEventId}
-                    onChange={(e) => handleEventChange(e.target.value)}
+                    labelId="dog-select-label"
+                    value={selectedDogId}
+                    onChange={(e) => setSelectedDogId(e.target.value)}
                     required
                 >
-                    <MenuItem value="" disabled>Select Event</MenuItem>
-                    {events.map((event) => (
-                        <MenuItem key={event.event_id} value={event.event_id}>{event.title}</MenuItem>
+                    <MenuItem value="" disabled>Select Dog</MenuItem>
+                    {dogs && dogs.map((dog) => (
+                        <MenuItem key={dog.dog_id} value={dog.dog_id}>{dog.name}</MenuItem>
                     ))}
                 </Select>
             </FormControl>
             <TextField
-                label="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                label="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
             />
             <TextField
-                label="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-            />
-            <TextField
-                label="Date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-            />
-            <FormControl>
-                <InputLabel id="country-label">Country</InputLabel>
-                <Select
-                    labelId="country-label"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    required
-                >
-                    <MenuItem value="Israel">Israel</MenuItem>
-                    {/* Add other countries as MenuItem */}
-                </Select>
-            </FormControl>
-            <TextField
-                label="City"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                required
-            />
-            <TextField
-                label="Volunteers Needed"
+                label="Age"
                 type="number"
-                value={volunteerNeeded}
-                onChange={(e) => setVolunteerNeeded(e.target.value)}
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
                 required
             />
             <FormControl>
-                <InputLabel id="event-type-label">Event Type</InputLabel>
+                <InputLabel id="breed-label">Breed</InputLabel>
                 <Select
-                    labelId="event-type-label"
-                    value={eventType}
-                    onChange={(e) => setEventType(e.target.value)}
+                    labelId="breed-label"
+                    value={selectedBreed}
+                    onChange={(e) => setSelectedBreed(e.target.value)}
                     required
                 >
-                    <MenuItem value="volunteer">Volunteer</MenuItem>
-                    <MenuItem value="customer">Customer</MenuItem>
+                    {/* Add breed options */}
                 </Select>
             </FormControl>
-            <TextField
-                label="Start Time"
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required
-                inputProps={{
-                    step: 900, // 15 minutes
-                }}
-            />
-            <TextField
-                label="End Time"
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required
-                inputProps={{
-                    step: 900, // 15 minutes
-                }}
-            />
-            <FormControl>
-                <InputLabel id="days-of-week-label">Days of Week</InputLabel>
-                <Select
-                    labelId="days-of-week-label"
-                    multiple
-                    value={daysOfWeek}
-                    onChange={(e) => setDaysOfWeek(e.target.value)}
-                    required
-                    renderValue={(selected) => selected.join(', ')}
-                >
-                    {daysOfWeekOptions.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-            <Button type="submit" variant="contained">Update Event</Button>
+            <Button type="submit" variant="contained">Update Dog</Button>
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
-                message="Event updated successfully"
+                message="Dog updated successfully"
             />
         </Box>
     );
 };
 
-export default EditEventForm;
+export default EditDogForm;
+
+
 
 
 

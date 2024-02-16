@@ -6,76 +6,62 @@ import { fetchUserDogs, selectUserDogs } from '../features/dogs/dogsSlice';
 import moment from 'moment';
 
 const AddEventForm = ({ updateEventList }) => {
-    const [eventType, setEventType] = useState('customer');
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [country, setCountry] = useState('Israel');
-    const [city, setCity] = useState('');
-    const [volunteerNeeded, setVolunteerNeeded] = useState(1);
-    const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState([]);
-    const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
-    const [selectedDog, setSelectedDog] = useState('');
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const dispatch = useDispatch();
-    const userDogs = useSelector(selectUserDogs);
+  const dispatch = useDispatch();
+  const userDogs = useSelector(selectUserDogs);
 
-    useEffect(() => {
-        dispatch(fetchUserDogs());
-    }, [dispatch]);
+  const [eventType, setEventType] = useState('customer');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [country, setCountry] = useState('Israel');
+  const [city, setCity] = useState('');
+  const [volunteerNeeded, setVolunteerNeeded] = useState(1);
+  const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
+  const [selectedDog, setSelectedDog] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
-    const handleDogChange = (event) => {
-        setSelectedDog(event.target.value); 
-    };
+  useEffect(() => {
+    dispatch(fetchUserDogs());
+  }, [dispatch]); // Добавляем dispatch в список зависимостей
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
     
-    // const handleDogChange = (event) => {
-    //     const selectedDogId = event.target.value || '';
-    //     // Find the dog object based on the selected ID
-    //     const selectedDog = userDogs.find(dog => dog.dog_id === selectedDogId);
-    //     if (selectedDog) {
-    //         // If the dog is found, set its ID to selectedDog
-    //         setSelectedDog(selectedDog.dog_id);
-    //     } else {
-    //         // If the dog is not found, reset selectedDog
-    //         setSelectedDog('');
-    //     }
-    // };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        
-        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
-
-        console.log('Selected Dog ID:', selectedDog);
-        
-        const eventData = {
-            title,
-            description,
-            event_type: eventType,
-            date: formattedDate,
-            country: country || undefined,
-            city: city || undefined,
-            volunteer_needed: Number(volunteerNeeded) || undefined,
-            days_of_week: selectedDaysOfWeek.join(',') || undefined,
-            dog_id: selectedDog || undefined
-        };
-        
-        console.log('Sending event data:', eventData);
-
-        try {
-            await dispatch(addEvent(eventData));
-
-            resetForm();
-            setSnackbarMessage('Event added successfully.');
-            setOpenSnackbar(true);
-            updateEventList && updateEventList();
-        } catch (error) {
-            console.error('Error adding event:', error);
-            setSnackbarMessage('Error adding event.');
-            setOpenSnackbar(true);
-        }
+    const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+    
+    const eventData = {
+      title,
+      description,
+      event_type: eventType,
+      date: formattedDate,
+      country: country || undefined,
+      city: city || undefined,
+      volunteer_needed: Number(volunteerNeeded) || undefined,
+      days_of_week: selectedDaysOfWeek.join(',') || undefined,
+      dog_id: selectedDog || undefined
     };
+  
+    dispatch(addEvent(eventData))
+    .then((result) => {
+    if (result.payload === 'success') {
+        resetForm();
+        setSnackbarMessage('Event added successfully.');
+        setOpenSnackbar(true);
+        updateEventList && updateEventList(); // Вызов функции обновления списка событий
+    } else {
+        console.error('Error adding event:', result.error);
+        setSnackbarMessage('Error adding event.');
+        setOpenSnackbar(true);
+    }
+    })
+
+      .catch((error) => {
+        console.error('Error adding event:', error);
+        setSnackbarMessage('Error adding event.');
+        setOpenSnackbar(true);
+      });
+  };
 
     const resetForm = () => {
         setTitle('');
@@ -94,10 +80,10 @@ const AddEventForm = ({ updateEventList }) => {
 
     const handleDayChange = (event) => setSelectedDaysOfWeek(typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value);
 
-   
-    const handleDateChange = (date) => setSelectedDate(date);
+    const handleDogChange = (event) => setSelectedDog(event.target.value);
 
-    
+    const handleDateChange = (date) => setSelectedDate(date);
+  
     if (!userDogs) {
         return <div>Loading...</div>;
     }
@@ -141,6 +127,7 @@ const AddEventForm = ({ updateEventList }) => {
 };
 
 export default AddEventForm;
+
 
 
 
