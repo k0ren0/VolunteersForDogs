@@ -108,18 +108,6 @@ router.delete('/:event_id', verifytoken, async (req, res) => {
     }
 });
 
-// Получение всех событий пользователя
-router.get('/', verifytoken, async (req, res) => {
-    try {
-        const events = await db('events');
-        res.json(events);
-    } catch (error) {
-        console.error('Error fetching events:', error);
-        res.status(500).json({ error: 'Error fetching events' });
-    }
-});
-
-
 // Получение всех событий для конкретного пользователя
 router.get('/:event_id', verifytoken, async (req, res) => {
     const user_id = req.user.user_id; // Предполагая, что user_id добавляется в объект req через middleware аутентификации
@@ -133,7 +121,386 @@ router.get('/:event_id', verifytoken, async (req, res) => {
     }
 });
 
+
+// Получение всех событий пользователя и фильтрация событий
+router.get('/', verifytoken, async (req, res) => {
+    const user_id = req.user.user_id;
+    const filters = req.query; // Получение всех параметров фильтрации из запроса
+
+    try {
+        let query = db('events').where({ user_id });
+
+        // Применение фильтрации, если параметры фильтрации были переданы в запросе
+        Object.keys(filters).forEach(key => {
+            // Проверка на существование параметра и его значения
+            if (filters[key]) {
+                if (key === 'start_date' || key === 'end_date') {
+                    // Для параметров даты применяем особую обработку
+                    query = query.whereBetween('date', [filters['start_date'], filters['end_date']]);
+                } else {
+                    // Для остальных параметров применяем фильтрацию по точному значению
+                    query = query.where(key, '=', filters[key]);
+                }
+            }
+        });
+
+        const events = await query;
+        res.json(events);
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        res.status(500).json({ error: 'Error fetching events' });
+    }
+});
+
+
+
+
 export default router;
+
+
+//////// last /////
+
+// import express from "express";
+// import { body, validationResult } from 'express-validator';
+// import { verifytoken } from "../middleware/verifyToken.js";
+// import { db } from "../config/db.js";
+// import moment from 'moment';
+
+// const router = express.Router();
+
+// // Middleware для логирования
+// function logRequest(req, res, next) {
+//     console.log(`${req.method} ${req.url}`, req.body);
+//     next();
+// }
+
+// router.use(logRequest); // Применение миддлвара логирования ко всем маршрутам
+
+// // Middleware для валидации
+// const eventValidationRules = [
+//     body('title').notEmpty().withMessage('Title is required'),
+//     body('description').notEmpty().withMessage('Description is required'),
+//     body('date').notEmpty().isDate().withMessage('Date must be a valid date'),
+//     body('country').notEmpty().withMessage('Country is required'),
+//     body('city').notEmpty().withMessage('City is required'),
+//     body('volunteer_needed').isNumeric().withMessage('Volunteer needed must be a number'),
+//     body('event_type').notEmpty().isIn(['volunteer', 'customer']).withMessage('Event type is required'),
+//     body('location').optional(),
+//     body('days_of_week').optional().isString().withMessage('Days of the week must be a string')
+//         .matches(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)(,(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday))*$/)
+//         .withMessage('Invalid value for days of the week'),
+//     body('dog_id').optional().isNumeric().withMessage('Dog ID must be numeric'),
+// ];
+
+// // Добавление события
+// router.post('/', verifytoken, eventValidationRules, async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     try {
+//         const eventData = {
+//             ...req.body,
+//             user_id: req.user.user_id, // Предполагается, что user_id добавляется в req через middleware аутентификации
+//             date: moment(req.body.date).format('YYYY-MM-DD') // Корректное форматирование даты
+//         };
+
+//         await db('events').insert(eventData);
+//         res.status(201).json({ message: 'Event added successfully' });
+//     } catch (error) {
+//         console.error('Error saving event:', error);
+//         res.status(500).json({ error: 'Error saving event' });
+//     }
+// });
+
+// // Обновление события
+// router.put('/:event_id', verifytoken, eventValidationRules, async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     const { event_id } = req.params;
+//     const eventData = {
+//         ...req.body,
+//         date: moment(req.body.date).format('YYYY-MM-DD') // Корректное форматирование даты
+//     };
+
+//     try {
+//         const event = await db('events').where({ event_id }).first();
+        
+//         if (!event) {
+//             return res.status(404).json({ error: 'Event not found.' });
+//         }
+
+//         if (event.user_id !== req.user.user_id) {
+//             return res.status(403).json({ error: 'You are not authorized to update this event.' });
+//         }
+
+//         const updated = await db('events').where({ event_id }).update(eventData).returning('*');
+        
+//         res.json({ message: 'Event updated successfully.', event: updated[0] });
+//     } catch (error) {
+//         console.error('Error updating event:', error);
+//         res.status(500).json({ error: 'Error updating event.' });
+//     }
+// });
+
+// // Удаление события
+// router.delete('/:event_id', verifytoken, async (req, res) => {
+//     const { event_id } = req.params;
+
+//     try {
+//         const event = await db('events').where({ event_id }).first();
+
+//         if (!event) {
+//             return res.status(404).json({ error: 'Event not found.' });
+//         }
+
+//         if (event.user_id !== req.user.user_id) {
+//             return res.status(403).json({ error: 'You are not authorized to delete this event.' });
+//         }
+
+//         await db('events').where({ event_id }).del();
+//         res.json({ message: 'Event deleted successfully.' });
+//     } catch (error) {
+//         console.error('Error deleting event:', error);
+//         res.status(500).json({ error: 'Error deleting event.' });
+//     }
+// });
+
+// // Получение всех событий пользователя
+// router.get('/', verifytoken, async (req, res) => {
+//     try {
+//         const events = await db('events');
+//         res.json(events);
+//     } catch (error) {
+//         console.error('Error fetching events:', error);
+//         res.status(500).json({ error: 'Error fetching events' });
+//     }
+// });
+
+
+// // Получение всех событий для конкретного пользователя
+// router.get('/:event_id', verifytoken, async (req, res) => {
+//     const user_id = req.user.user_id; // Предполагая, что user_id добавляется в объект req через middleware аутентификации
+
+//     try {
+//         const events = await db('events').where({ user_id });
+//         res.json(events);
+//     } catch (error) {
+//         console.error('Error fetching user events:', error);
+//         res.status(500).json({ error: 'Error fetching user events' });
+//     }
+// });
+
+
+// // Получение всех событий с возможностью фильтрации
+// router.get('/', verifytoken, async (req, res) => {
+//     const user_id = req.user.user_id;
+//     const filters = req.query; // Получение всех параметров фильтрации из запроса
+
+//     try {
+//         let query = db('events').where({ user_id });
+
+//         // Применение фильтрации, если параметры фильтрации были переданы в запросе
+//         Object.keys(filters).forEach(key => {
+//             // Проверка на существование параметра и его значения
+//             if (filters[key]) {
+//                 if (key === 'start_date' || key === 'end_date') {
+//                     // Для параметров даты применяем особую обработку
+//                     query = query.whereBetween('date', [filters['start_date'], filters['end_date']]);
+//                 } else {
+//                     // Для остальных параметров применяем фильтрацию по точному значению
+//                     query = query.where(key, '=', filters[key]);
+//                 }
+//             }
+//         });
+
+//         const events = await query;
+//         res.json(events);
+//     } catch (error) {
+//         console.error('Error fetching events:', error);
+//         res.status(500).json({ error: 'Error fetching events' });
+//     }
+// });
+
+
+
+// export default router;
+
+
+
+// import express from "express";
+// import { body, validationResult } from 'express-validator';
+// import { verifytoken } from "../middleware/verifyToken.js";
+// import { db } from "../config/db.js";
+// import moment from 'moment';
+
+// const router = express.Router();
+
+// // Middleware для логирования
+// function logRequest(req, res, next) {
+//     console.log(`${req.method} ${req.url}`, req.body);
+//     next();
+// }
+
+// router.use(logRequest); // Применение миддлвара логирования ко всем маршрутам
+
+// // Middleware для валидации
+// const eventValidationRules = [
+//     body('title').notEmpty().withMessage('Title is required'),
+//     body('description').notEmpty().withMessage('Description is required'),
+//     body('date').notEmpty().isDate().withMessage('Date must be a valid date'),
+//     body('country').notEmpty().withMessage('Country is required'),
+//     body('city').notEmpty().withMessage('City is required'),
+//     body('volunteer_needed').isNumeric().withMessage('Volunteer needed must be a number'),
+//     body('event_type').notEmpty().isIn(['volunteer', 'customer']).withMessage('Event type is required'),
+//     body('location').optional(),
+//     body('days_of_week').optional().isString().withMessage('Days of the week must be a string')
+//         .matches(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)(,(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday))*$/)
+//         .withMessage('Invalid value for days of the week'),
+//     body('dog_id').optional().isNumeric().withMessage('Dog ID must be numeric'),
+// ];
+
+// // Добавление события
+// router.post('/', verifytoken, eventValidationRules, async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     try {
+//         const eventData = {
+//             ...req.body,
+//             user_id: req.user.user_id, // Предполагается, что user_id добавляется в req через middleware аутентификации
+//             date: moment(req.body.date).format('YYYY-MM-DD') // Корректное форматирование даты
+//         };
+
+//         await db('events').insert(eventData);
+//         res.status(201).json({ message: 'Event added successfully' });
+//     } catch (error) {
+//         console.error('Error saving event:', error);
+//         res.status(500).json({ error: 'Error saving event' });
+//     }
+// });
+
+// // Обновление события
+// router.put('/:event_id', verifytoken, eventValidationRules, async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     const { event_id } = req.params;
+//     const eventData = {
+//         ...req.body,
+//         date: moment(req.body.date).format('YYYY-MM-DD') // Корректное форматирование даты
+//     };
+
+//     try {
+//         const event = await db('events').where({ event_id }).first();
+        
+//         if (!event) {
+//             return res.status(404).json({ error: 'Event not found.' });
+//         }
+
+//         if (event.user_id !== req.user.user_id) {
+//             return res.status(403).json({ error: 'You are not authorized to update this event.' });
+//         }
+
+//         const updated = await db('events').where({ event_id }).update(eventData).returning('*');
+        
+//         res.json({ message: 'Event updated successfully.', event: updated[0] });
+//     } catch (error) {
+//         console.error('Error updating event:', error);
+//         res.status(500).json({ error: 'Error updating event.' });
+//     }
+// });
+
+// // Удаление события
+// router.delete('/:event_id', verifytoken, async (req, res) => {
+//     const { event_id } = req.params;
+
+//     try {
+//         const event = await db('events').where({ event_id }).first();
+
+//         if (!event) {
+//             return res.status(404).json({ error: 'Event not found.' });
+//         }
+
+//         if (event.user_id !== req.user.user_id) {
+//             return res.status(403).json({ error: 'You are not authorized to delete this event.' });
+//         }
+
+//         await db('events').where({ event_id }).del();
+//         res.json({ message: 'Event deleted successfully.' });
+//     } catch (error) {
+//         console.error('Error deleting event:', error);
+//         res.status(500).json({ error: 'Error deleting event.' });
+//     }
+// });
+
+// // Получение всех событий пользователя
+// router.get('/', verifytoken, async (req, res) => {
+//     try {
+//         const events = await db('events');
+//         res.json(events);
+//     } catch (error) {
+//         console.error('Error fetching events:', error);
+//         res.status(500).json({ error: 'Error fetching events' });
+//     }
+// });
+
+
+// // Получение всех событий для конкретного пользователя
+// router.get('/:event_id', verifytoken, async (req, res) => {
+//     const user_id = req.user.user_id; // Предполагая, что user_id добавляется в объект req через middleware аутентификации
+
+//     try {
+//         const events = await db('events').where({ user_id });
+//         res.json(events);
+//     } catch (error) {
+//         console.error('Error fetching user events:', error);
+//         res.status(500).json({ error: 'Error fetching user events' });
+//     }
+// });
+
+
+// // Получение всех событий с возможностью фильтрации
+// router.get('/', verifytoken, async (req, res) => {
+//     const user_id = req.user.user_id;
+//     const filters = req.query; // Получение всех параметров фильтрации из запроса
+
+//     try {
+//         let query = db('events').where({ user_id });
+
+//         // Применение фильтрации, если параметры фильтрации были переданы в запросе
+//         Object.keys(filters).forEach(key => {
+//             // Проверка на существование параметра и его значения
+//             if (filters[key]) {
+//                 if (key === 'start_date' || key === 'end_date') {
+//                     // Для параметров даты применяем особую обработку
+//                     query = query.whereBetween('date', [filters['start_date'], filters['end_date']]);
+//                 } else {
+//                     // Для остальных параметров применяем фильтрацию по точному значению
+//                     query = query.where(key, '=', filters[key]);
+//                 }
+//             }
+//         });
+
+//         const events = await query;
+//         res.json(events);
+//     } catch (error) {
+//         console.error('Error fetching events:', error);
+//         res.status(500).json({ error: 'Error fetching events' });
+//     }
+// });
+
+
+
+// export default router;
 
 
 

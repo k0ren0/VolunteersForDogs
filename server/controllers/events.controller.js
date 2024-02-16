@@ -29,7 +29,28 @@ export const _addEvent = async (req, res) => {
 // Получение всех событий
 export const _getAllEvents = async (req, res) => {
     try {
-        const events = await db.select('*').from('events');
+        let query = db.select('*').from('events');
+        const filters = req.query;
+        if (filters) {
+            // Применяем фильтры к запросу
+            if (filters.title) {
+                query = query.where('title', 'ilike', `%${filters.title}%`);
+            }
+            if (filters.city) {
+                query = query.where('city', 'ilike', `%${filters.city}%`);
+            }
+            if (filters.date) {
+                query = query.where('date', filters.date);
+            }
+            if (filters.event_type) {
+                query = query.where('event_type', filters.event_type);
+            }
+            if (filters.day_of_week) {
+                query = query.where('days_of_week', filters.day_of_week);
+            }
+            // Добавьте дополнительные условия фильтрации по мере необходимости
+        }
+        const events = await query;
         res.json(events);
     } catch (error) {
         console.error('Error fetching events:', error);
@@ -89,6 +110,98 @@ export const _deleteEvent = async (req, res) => {
         res.status(500).json({ error: 'Error deleting event' });
     }
 };
+
+
+
+// import { validationResult } from 'express-validator';
+// import { db } from '../config/db.js';
+// import moment from 'moment';
+
+// // Добавление события
+// export const _addEvent = async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     try {
+//         const { title, description, date, location, volunteer_needed, event_type, days_of_week, dog_id } = req.body;
+//         const user_id = req.user.user_id; // предполагается, что user_id добавляется в req через middleware аутентификации
+
+//         const [newEvent] = await db('events').insert({
+//             user_id, title, description, date, location, volunteer_needed, event_type, days_of_week, dog_id
+//         }).returning('*');
+
+//         res.status(201).json({ message: 'Event added successfully', event: newEvent });
+//     } catch (error) {
+//         console.error('Error adding event:', error);
+//         res.status(500).json({ error: 'Error adding event' });
+//     }
+// };
+
+// // Получение всех событий
+// export const _getAllEvents = async (req, res) => {
+//     try {
+//         const events = await db.select('*').from('events');
+//         res.json(events);
+//     } catch (error) {
+//         console.error('Error fetching events:', error);
+//         res.status(500).json({ error: 'Error fetching events' });
+//     }
+// };
+
+// // Получение события по ID
+// export const _getEventById = async (req, res) => {
+//     const { event_id } = req.params;
+//     try {
+//         const event = await db.select('*').from('events').where({ event_id }).first();
+//         if (!event) {
+//             return res.status(404).json({ message: 'Event not found' });
+//         }
+//         res.json(event);
+//     } catch (error) {
+//         console.error('Error fetching event:', error);
+//         res.status(500).json({ error: 'Error fetching event' });
+//     }
+// };
+
+// // Обновление события
+// export const _updateEvent = async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     const { event_id } = req.params;
+//     const eventData = req.body;
+
+//     try {
+//         const updated = await db('events').where({ event_id }).update(eventData).returning('*');
+//         if (updated.length === 0) {
+//             return res.status(404).json({ message: 'Event not found' });
+//         }
+//         res.json({ message: 'Event updated successfully', event: updated[0] });
+//     } catch (error) {
+//         console.error('Error updating event:', error);
+//         res.status(500).json({ error: 'Error updating event' });
+//     }
+// };
+
+// // Удаление события
+// export const _deleteEvent = async (req, res) => {
+//     const { event_id } = req.params;
+
+//     try {
+//         const deleted = await db('events').where({ event_id }).del();
+//         if (deleted === 0) {
+//             return res.status(404).json({ message: 'Event not found' });
+//         }
+//         res.status(204).send({ message: 'Event deleted successfully' });
+//     } catch (error) {
+//         console.error('Error deleting event:', error);
+//         res.status(500).json({ error: 'Error deleting event' });
+//     }
+// };
 
 
 

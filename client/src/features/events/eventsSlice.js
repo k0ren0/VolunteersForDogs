@@ -16,15 +16,6 @@ const getToken = (getState) => {
     return token;
 };
 
-// export const fetchEvents = createAsyncThunk('events/fetchEvents', async (_, { rejectWithValue }) => {
-//     try {
-//         const response = await axiosInstance.get('/events');
-//         return response.data;
-//     } catch (error) {
-//         return rejectWithValue(error.response?.data?.error || error.message);
-//     }
-// });
-
 export const fetchEvents = createAsyncThunk('events/fetchEvents', async (_, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     if (!token) return rejectWithValue('Token not found');
@@ -48,6 +39,8 @@ export const fetchFilteredEvents = createAsyncThunk('events/fetchFilteredEvents'
         return rejectWithValue(error.response?.data?.error || error.message);
     }
 });
+
+
 
 export const fetchUserEvents = createAsyncThunk('events/fetchUserEvents', async (_, { getState, rejectWithValue }) => {
     const token = getToken(getState);
