@@ -67,24 +67,24 @@ export const addEvent = createAsyncThunk('events/addEvent', async (eventData, { 
     }
 });
 
-export const deleteEvent = createAsyncThunk('events/deleteEvent', async (eventId, { getState, rejectWithValue }) => {
+export const deleteEvent = createAsyncThunk('events/deleteEvent', async (event_id, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     if (!token) return rejectWithValue('Token not found');
     try {
-        await axiosInstance.delete(`/events/${eventId}`, {
+        await axiosInstance.delete(`/events/${event_id}`, {
             headers: { 'Authorization': `Bearer ${token}` },
         });
-        return eventId;
+        return event_id;
     } catch (error) {
         return rejectWithValue(error.response.data);
     }
 });
 
-export const updateEvent = createAsyncThunk('events/updateEvent', async ({ eventId, eventData }, { getState, rejectWithValue }) => {
+export const updateEvent = createAsyncThunk('events/updateEvent', async ({ event_id, eventData }, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     if (!token) return rejectWithValue('Token not found');
     try {
-        const response = await axiosInstance.put(`/events/${eventId}`, eventData, {
+        const response = await axiosInstance.put(`/events/${event_id}`, eventData, {
             headers: { 'Authorization': `Bearer ${token}` },
         });
         return response.data;
