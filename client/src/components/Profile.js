@@ -10,7 +10,7 @@ import UserProfileForm from './UserProfileForm';
 // import AddDogForm from './AddDogForm';
 import AddEventForm from './AddEventForm';
 import EventsList from './EventsList';
-// import EditEventForm from './EditEventForm';
+import EditEventForm from './EditEventForm';
 
 function Profile() {
   const dispatch = useDispatch();
@@ -101,7 +101,7 @@ function Profile() {
             <Typography variant="h5" gutterBottom>My Events</Typography>
             <AddEventForm />
             <EventsList />
-            {/* <EditEventForm /> */}
+            <EditEventForm />
             </Box>
         )}
 
