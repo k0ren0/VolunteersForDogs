@@ -76,7 +76,7 @@ export const _all = async (req, res) => {
 };
 
 export const _updateUserById = async (req, res) => {
-    const user_id = req.params.id;
+    const user_id = req.params.user_id;
     const userData = req.body; // Assume this does not contain password for simplicity. If updating password, hash it first.
 
     try {
@@ -92,7 +92,7 @@ export const _updateUserById = async (req, res) => {
 };
 
 export const _getUserById = async (req, res) => {
-    const user_id = req.params.id;
+    const user_id = req.user.user_id;
 
     try {
         const user = await getUserById(user_id);

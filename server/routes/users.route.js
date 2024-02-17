@@ -87,8 +87,9 @@ const router = express.Router();
 router.post('/register', _register);
 router.post('/login', _login);
 router.get('/', verifytoken, _all);
-router.get('/:id', verifytoken, _getUserById); 
-router.put('/:id', verifytoken, _updateUserById); 
+router.get('/:user_id', verifytoken, _getUserById); 
+
+router.put('/:user_id', verifytoken, _updateUserById); 
 router.get('/dogs', verifytoken, async (req, res) => {
     const user_id = req.user.user_id;
     try {

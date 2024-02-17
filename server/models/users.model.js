@@ -48,9 +48,9 @@ export const updateUserById = async (user_id, userData) => {
     }
 };
 
-export const getUserDogsById = async (userId) => {
+export const getUserDogsById = async (user_id) => {
     try {
-        const dogs = await db('dogs').where({ user_id: userId });
+        const dogs = await db('dogs').where({ user_id });
         return dogs;
     } catch (error) {
         console.error("Error fetching user's dogs:", error);
@@ -58,9 +58,9 @@ export const getUserDogsById = async (userId) => {
     }
 };
 
-export const getUserEventsById = async (userId) => {
+export const getUserEventsById = async (user_id) => {
     try {
-        const events = await db('events').where({ user_id: userId });
+        const events = await db('events').where({ user_id });
         return events;
     } catch (error) {
         console.error("Error fetching user's events:", error);

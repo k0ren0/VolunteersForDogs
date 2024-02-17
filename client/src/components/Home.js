@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Typography, Container, Grid, Card, CardContent, IconButton, Button } from '@mui/material';
+import { Typography, Container, Grid, Card, IconButton, Button } from '@mui/material'; //CardContent,
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled, keyframes } from '@mui/system';
 

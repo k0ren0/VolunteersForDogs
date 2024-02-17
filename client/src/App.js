@@ -36,7 +36,7 @@ function App() {
         <Route path="/register" element={<LoginRegister page="Register" />} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
-        <Route path="/my-profile" element={<ProtectedRoute><UserProfileForm /></ProtectedRoute>} />
+        <Route path="/{user_id}" element={<ProtectedRoute><UserProfileForm /></ProtectedRoute>} />
         <Route path="/events-list" element={<ProtectedRoute><EventsList /></ProtectedRoute>} />
         <Route path="/mydogs" element={<ProtectedRoute><DogsList /></ProtectedRoute>} />
         <Route path="/adddog" element={<ProtectedRoute><AddDogForm /></ProtectedRoute>} />
