@@ -75,22 +75,6 @@ export const _all = async (req, res) => {
     }
 };
 
-export const _updateUserById = async (req, res) => {
-    const user_id = req.params.user_id;
-    const userData = req.body; // Assume this does not contain password for simplicity. If updating password, hash it first.
-
-    try {
-        const updateResult = await updateUserById(user_id, userData);
-        if (updateResult.success) {
-            res.json({ message: "User profile updated successfully", user: updateResult.user });
-        } else {
-            res.status(400).json({ message: updateResult.message });
-        }
-    } catch (error) {
-        res.status(500).json({ message: "Error updating user profile", error });
-    }
-};
-
 export const _getUserById = async (req, res) => {
     const user_id = req.user.user_id;
 
@@ -105,6 +89,22 @@ export const _getUserById = async (req, res) => {
     } catch (error) {
         console.log("getUserById =>", error);
         res.status(500).json({ msg: "Something went wrong" });
+    }
+};
+
+export const _updateUserById = async (req, res) => {
+    const user_id = req.params.user_id;
+    const updateUserData = req.body; // Assume this does not contain password for simplicity. If updating password, hash it first.
+
+    try {
+        const updateResult = await updateUserById(user_id, updateUserData);
+        if (updateResult.success) {
+            res.json({ message: "User profile updated successfully", user: updateResult.user });
+        } else {
+            res.status(400).json({ message: updateResult.message });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Error updating user profile", error });
     }
 };
 

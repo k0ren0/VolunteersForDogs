@@ -18,7 +18,7 @@ const getToken = (getState) => {
 
 export const fetchUserById = createAsyncThunk(
     'users/fetchUserById',
-    async (user_id, { getState, rejectWithValue }) => {
+    async ({ user_id }, { getState, rejectWithValue }) => { // Здесь объект с единственным свойством user_id
       const token = getToken(getState);
       if (!token) return rejectWithValue('Token not found');
       try {
@@ -34,6 +34,7 @@ export const fetchUserById = createAsyncThunk(
     }
 );
 
+
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     if (!token) return rejectWithValue('Token not found');
@@ -47,18 +48,37 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { getSt
     }
 });
 
-export const updateUserById = createAsyncThunk('users/updateUserById', async ({ user_id, userData }, { getState, rejectWithValue }) => {
-    const token = getToken(getState);
-    if (!token) return rejectWithValue('Token not found');
-    try {
-        const response = await axiosInstance.put(`/users/${user_id}`, userData, {
-            headers: { 'Authorization': `Bearer ${token}` },
+// export const updateUserById = createAsyncThunk('users/updateUserById', async ({ user_id, updateUserData }, { getState, rejectWithValue }) => {
+//     const token = getToken(getState);
+//     if (!token) return rejectWithValue('Token not found');
+//     try {
+//         const response = await axiosInstance.put(`/users/${user_id}`, updateUserData, {
+//             headers: { 'Authorization': `Bearer ${token}` },
+//         });
+//         return response.data;
+//     } catch (err) {
+//         return rejectWithValue(err.response.data);
+//     }
+// });
+
+export const updateUserById = createAsyncThunk(
+    'users/updateUserById',
+    async ({ user_id, updatedUserData }, { getState, rejectWithValue }) => {
+      const token = getToken(getState);
+      if (!token) return rejectWithValue('Token not found');
+  
+      try {
+        const response = await axiosInstance.put(`/users/${user_id}`, updatedUserData, {
+          headers: { 'Authorization': `Bearer ${token}` },
         });
         return response.data;
-    } catch (err) {
+      } catch (err) {
         return rejectWithValue(err.response.data);
+      }
     }
-});
+);
+
+  
 
 export const addDog = createAsyncThunk('users/addDog', async (dogData, { getState, rejectWithValue }) => {
     const token = getToken(getState);

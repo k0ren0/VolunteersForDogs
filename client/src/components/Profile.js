@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Typography, Paper, Tabs, Tab, Grid } from '@mui/material';
-import { fetchUserById } from '../features/users/usersSlice';
+import { Box, Typography, Paper, Tabs, Tab } from '@mui/material'; //, Grid 
+import { fetchUserById, updateUserById } from '../features/users/usersSlice';
 import UserProfileForm from './UserProfileForm';
 import DogsList from './DogsList';
-import AddDogForm from './AddDogForm';
+// import AddDogForm from './AddDogForm';
 import EventsList from './EventsList';
 import AddEventForm from './AddEventForm';
 
 function Profile() {
   const dispatch = useDispatch();
   const { token, user_id } = useSelector((state) => state.auth);
-  const { loading, error } = useSelector((state) => state.users);
+  const { user, loading, error } = useSelector((state) => state.users);
   const [selectedTab, setSelectedTab] = React.useState(0);
 
   useEffect(() => {
@@ -20,6 +20,12 @@ function Profile() {
       dispatch(fetchUserById(user_id));
     }
   }, [dispatch, token, user_id]);
+
+  const handleUpdateById = (updatedUserData) => {
+    dispatch(updateUserById({ user_id: user.user_id, updatedUserData: updatedUserData }));
+    // Добавлено логирование после обновления пользователя
+    console.log('User updated:', updatedUserData);
+  };
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -40,13 +46,13 @@ function Profile() {
         {selectedTab === 0 && (
           loading ? <Typography>Loading user profile...</Typography> :
           error ? <Typography>Error loading profile. Please try again later.</Typography> :
-          <UserProfileForm />
+          <UserProfileForm user={user} onUpdate={handleUpdateById} /> // Передаем user и функцию onUpdate в UserProfileForm
         )}
 
         {selectedTab === 1 && (
           <Box mt={2}>
             <DogsList />
-            <AddDogForm />
+            {/* <AddDogForm /> */}
           </Box>
         )}
 
@@ -62,6 +68,143 @@ function Profile() {
 }
 
 export default Profile;
+
+
+
+// import React, { useEffect } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { Box, Typography, Paper, Tabs, Tab } from '@mui/material';
+// import { fetchUserById } from '../features/users/usersSlice';
+// import UserProfileForm from './UserProfileForm';
+// import DogsList from './DogsList';
+// import AddDogForm from './AddDogForm';
+// import EventsList from './EventsList';
+// import AddEventForm from './AddEventForm';
+
+// function Profile() {
+//   const dispatch = useDispatch();
+//   const { token, user_id } = useSelector((state) => state.auth);
+//   const { loading, error, user } = useSelector((state) => state.users);
+//   const [selectedTab, setSelectedTab] = React.useState(0);
+
+//   useEffect(() => {
+//     if (token && user_id) {
+//       console.log('Fetching user data for user_id:', user_id);
+//       dispatch(fetchUserById(user_id));
+//     }
+//   }, [dispatch, token, user_id]);
+
+//   const handleTabChange = (event, newValue) => {
+//     setSelectedTab(newValue);
+//   };
+
+//   const handleUpdateById = (updatedUserData) => {
+//     // Ваша логика обновления пользователя
+//   };
+
+//   return (
+//     <Box p={3}>
+//       <Typography variant="h4" gutterBottom>My Info</Typography>
+//       <Paper sx={{ marginBottom: 2 }}>
+//         <Tabs value={selectedTab} onChange={handleTabChange} aria-label="profile tabs" centered>
+//           <Tab label="My Profile" />
+//           <Tab label="My Dogs" />
+//           <Tab label="My Events" />
+//         </Tabs>
+//       </Paper>
+
+//       <Box mt={2}>
+//         {selectedTab === 0 && (
+//           loading ? <Typography>Loading user profile...</Typography> :
+//           error ? <Typography>Error loading profile. Please try again later.</Typography> :
+//           <UserProfileForm user={user} onUpdate={handleUpdateById} />
+//         )}
+
+//         {selectedTab === 1 && (
+//           <Box mt={2}>
+//             <DogsList />
+//             <AddDogForm />
+//           </Box>
+//         )}
+
+//         {selectedTab === 2 && (
+//           <Box mt={2}>
+//             <AddEventForm />
+//             <EventsList />
+//           </Box>
+//         )}
+//       </Box>
+//     </Box>
+//   );
+// }
+
+// export default Profile;
+
+
+// import React, { useEffect } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { Box, Typography, Paper, Tabs, Tab, Grid } from '@mui/material';
+// import { fetchUserById } from '../features/users/usersSlice';
+// import UserProfileForm from './UserProfileForm';
+// import DogsList from './DogsList';
+// import AddDogForm from './AddDogForm';
+// import EventsList from './EventsList';
+// import AddEventForm from './AddEventForm';
+
+// function Profile() {
+//   const dispatch = useDispatch();
+//   const { token, user_id } = useSelector((state) => state.auth);
+//   const { loading, error } = useSelector((state) => state.users);
+//   const [selectedTab, setSelectedTab] = React.useState(0);
+
+//   useEffect(() => {
+//     if (token && user_id) {
+//       console.log('Fetching user data for user_id:', user_id);
+//       dispatch(fetchUserById(user_id));
+//     }
+//   }, [dispatch, token, user_id]);
+
+//   const handleTabChange = (event, newValue) => {
+//     setSelectedTab(newValue);
+//   };
+
+//   return (
+//     <Box p={3}>
+//       <Typography variant="h4" gutterBottom>My Info</Typography>
+//       <Paper sx={{ marginBottom: 2 }}>
+//         <Tabs value={selectedTab} onChange={handleTabChange} aria-label="profile tabs" centered>
+//           <Tab label="My Profile" />
+//           <Tab label="My Dogs" />
+//           <Tab label="My Events" />
+//         </Tabs>
+//       </Paper>
+
+//       <Box mt={2}>
+//         {selectedTab === 0 && (
+//           loading ? <Typography>Loading user profile...</Typography> :
+//           error ? <Typography>Error loading profile. Please try again later.</Typography> :
+//           <UserProfileForm />
+//         )}
+
+//         {selectedTab === 1 && (
+//           <Box mt={2}>
+//             <DogsList />
+//             <AddDogForm />
+//           </Box>
+//         )}
+
+//         {selectedTab === 2 && (
+//           <Box mt={2}>
+//             <AddEventForm />
+//             <EventsList />
+//           </Box>
+//         )}
+//       </Box>
+//     </Box>
+//   );
+// }
+
+// export default Profile;
 
 
 

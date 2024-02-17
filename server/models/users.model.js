@@ -39,9 +39,9 @@ export const getUserById = async (user_id) => {
 };
 
 
-export const updateUserById = async (user_id, userData) => {
+export const updateUserById = async (user_id, updateUserData) => {
     try {
-        const result = await db('users').where({ user_id }).update(userData);
+        const result = await db('users').where({ user_id }).update(updateUserData);
         return { success: true, message: 'User updated successfully' };
     } catch (error) {
         return { success: false, message: 'Failed to update user', error };
