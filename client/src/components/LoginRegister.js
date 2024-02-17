@@ -67,7 +67,7 @@ const LoginRegister = ({ page }) => {
           <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
             <TextField
               fullWidth
-              margin="normal"
+              margin="dense"
               id="email"
               type="email"
               label="Enter your email"
@@ -77,7 +77,7 @@ const LoginRegister = ({ page }) => {
             />
             <TextField
               fullWidth
-              margin="normal"
+              margin="dense"
               id="password"
               type="password"
               label="Enter your password"

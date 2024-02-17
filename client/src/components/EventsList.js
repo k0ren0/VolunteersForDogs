@@ -138,7 +138,7 @@ function EventsList() {
                     {moment(event.date).format('YYYY-MM-DD')}
                   </TableCell>
                   <TableCell>{event.event_type}</TableCell>
-                  <TableCell>{event.day_of_week}</TableCell>
+                  <TableCell>{event.days_of_week}</TableCell>
                   <TableCell>{userDogs && userDogs.some(dog => dog.user_id === event.user_id) ? userDogs.find(dog => dog.user_id === event.user_id).breed : '-'}</TableCell>
                   <TableCell>
                     {isEditing === event.event_id ? (

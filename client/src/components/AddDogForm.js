@@ -60,7 +60,7 @@ const AddDogForm = ({ updateDogList }) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    margin="normal"
+                    margin="dense"
                 />
                 <Select
                     fullWidth
@@ -69,7 +69,7 @@ const AddDogForm = ({ updateDogList }) => {
                     required
                     displayEmpty
                     inputProps={{ 'aria-label': 'Breed' }}
-                    margin="normal"
+                    margin="dense"
                 >
                     <MenuItem value="" disabled>Select Breed</MenuItem>
                     {breedsList.map((breed, index) => (
@@ -83,7 +83,7 @@ const AddDogForm = ({ updateDogList }) => {
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
                     required
-                    margin="normal"
+                    margin="dense"
                 />
                 <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
                     Add Dog

@@ -72,7 +72,7 @@ const AddEventForm = ({ updateEventList }) => {
             resetForm();
             setSnackbarMessage('Event added successfully.');
             setOpenSnackbar(true);
-            updateEventList && updateEventList();
+            updateEventList();
         } catch (error) {
             console.error('Error adding event:', error);
             setSnackbarMessage('Error adding event.');

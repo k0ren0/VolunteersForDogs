@@ -66,7 +66,7 @@ const EditDogForm = () => {
                             onChange={(e) => setSelectedDogId(e.target.value)}
                             displayEmpty
                             required
-                            margin="normal"
+                            margin="dense"
                         >
                             <MenuItem value="" disabled>Select Dog</MenuItem>
                             {dogs.map((dog) => (
@@ -75,7 +75,7 @@ const EditDogForm = () => {
                         </Select>
                         <TextField
                             fullWidth
-                            margin="normal"
+                            margin="dense"
                             label="Name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -87,7 +87,7 @@ const EditDogForm = () => {
                             onChange={(e) => setSelectedBreed(e.target.value)}
                             displayEmpty
                             required
-                            margin="normal"
+                            margin="dense"
                         >
                             <MenuItem value="" disabled>Breed</MenuItem>
                             {breedsList.map((breed, index) => (
