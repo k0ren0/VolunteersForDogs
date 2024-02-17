@@ -19,7 +19,7 @@ const CustomNavLink = styled(NavLink)(({ theme }) => ({
   },
   '&:active': {
     filter: 'brightness(80%)',
-    transition: 'filter 0.3s ease', // Плавная трансформация при нажатии
+    transition: 'filter 0.3s ease', // transformation
   },
 }));
 
@@ -48,7 +48,7 @@ const Nav = () => {
   return (
     <>
       <AppBar position="static" sx={{
-        backgroundImage: theme.palette.mode === 'dark' ? 'linear-gradient(to right, #607D8B, #283593)' : 'linear-gradient(to right, #64B5F6, #2196F3)',
+        backgroundImage: theme.palette.mode === 'dark' ? 'linear-gradient(to right, #333333, #283593)' : 'linear-gradient(to right, #64B5F6, #2196F3)',
         boxShadow: 'none',
       }}>
         <Toolbar>
@@ -113,6 +113,7 @@ const Nav = () => {
 };
 
 export default Nav;
+
 
 
 

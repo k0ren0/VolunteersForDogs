@@ -23,21 +23,24 @@ const CustomThemeProvider = ({ children }) => {
       createTheme({
         palette: {
           mode,
+          primary: {
+            main: '#2962ff', // Измените основной цвет на ваш выбор
+          },
           ...(mode === 'dark' ? {
             background: {
-              default: '#121212',
-              paper: '#424242',
+              default: '#263238', // Темно-серый фон в темной теме
+              paper: '#37474f', // Более темно-серый цвет для контента
             },
             text: {
-              primary: '#ffffff',
+              primary: '#ffffff', // Белый текст в темной теме
             },
           } : {
             background: {
-              default: '#f7f7f7',
-              paper: '#ffffff',
+              default: '#f5f5f5', // Светло-серый фон в светлой теме
+              paper: '#ffffff', // Белый фон для контента
             },
             text: {
-              primary: '#000000',
+              primary: '#000000', // Черный текст в светлой теме
             },
           }),
         },
@@ -56,3 +59,4 @@ const CustomThemeProvider = ({ children }) => {
 };
 
 export default CustomThemeProvider;
+
