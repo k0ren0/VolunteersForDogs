@@ -1,92 +1,195 @@
-export const getAllEvents = async (filters) => {
+import { db } from "../config/db.js";
+import bcrypt from 'bcryptjs';
+
+export const register = async (username, email, password, firstName, lastName, dateOfBirth) => {
     try {
-        let query = db.select('*').from('events');
-        if (filters) {
-            // Применяем фильтры к запросу
-            if (filters.title) {
-                query = query.where('title', 'ilike', `%${filters.title}%`);
-            }
-            if (filters.city) {
-                query = query.where('city', 'ilike', `%${filters.city}%`);
-            }
-            if (filters.date) {
-                query = query.where('date', filters.date);
-            }
-            if (filters.event_type) {
-                query = query.where('event_type', filters.event_type);
-            }
-            if (filters.day_of_week) {
-                query = query.where('days_of_week', filters.day_of_week);
-            }
-            // Добавьте дополнительные условия фильтрации по мере необходимости
-        }
-        const events = await query;
-        return events;
+        const hashedPassword = await bcrypt.hash(password, 10); // Хеширование пароля
+        const newUser = await db.query(
+            'INSERT INTO users (username, email, password, firstName, lastName, dateOfBirth) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [username, email, hashedPassword, firstName, lastName, dateOfBirth]
+        );
+        return { success: true, message: "Registration successful", user: newUser.rows[0] };
     } catch (error) {
-        console.error('Error fetching events:', error);
-        throw new Error('Error fetching events');
+        return { success: false, message: "Registration failed", error: error.detail };
     }
 };
 
-// Удаление события по идентификатору
-export const deleteEvent = async (event_id) => {
+export const checkEmailExists = async (email) => {
     try {
-        const deletedCount = await db('events').where({ event_id }).del();
-        if (deletedCount === 0) {
-            throw new Error('Event not found');
-        }
-        return deletedCount;
+        const user = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+        return user.rows.length > 0;
     } catch (error) {
-        console.error('Error deleting event:', error);
-        throw new Error('Error deleting event');
+        console.error("Error checking email existence:", error);
+        throw new Error("Failed to check email existence");
     }
 };
 
-// Добавление события
-export const addEvent = async (title, description, date, location, volunteer_needed, event_type, days_of_week, user_id, dog_id) => {
+export const login = async (email) => {
     try {
-        const [newEvent] = await db('events').insert({
-            title,
-            description,
-            date,
-            location,
-            volunteer_needed,
-            event_type,
-            days_of_week,
-            user_id,
-            dog_id
-        }).returning('*');
-        return newEvent;
+        const user = await db.query('SELECT email, password, user_id FROM users WHERE email = $1', [email]);
+        return user.rows[0] || null;
     } catch (error) {
-        console.error('Error adding event:', error);
-        throw new Error('Error adding event');
+        console.error("Error during login:", error);
+        throw new Error("Login failed");
     }
 };
 
-// Получение события по идентификатору
-export const getEventById = async (event_id) => {
+export const getAllUsers = async () => {
     try {
-        const event = await db.select('*').from('events').where({ event_id }).first();
-        return event;
+        const users = await db.query('SELECT user_id, username, email, firstName, lastName, dateOfBirth FROM users ORDER BY user_id');
+        return users.rows;
     } catch (error) {
-        console.error('Error fetching event:', error);
-        throw new Error('Error fetching event');
+        console.error("Error fetching all users:", error);
+        throw new Error("Failed to fetch all users");
     }
 };
 
-// Обновление события по идентификатору
-export const updateEvent = async (event_id, eventData) => {
+export const getUserById = async (user_id) => {
     try {
-        const updatedEvents = await db('events').where({ event_id }).update(eventData).returning('*');
-        if (updatedEvents.length === 0) {
-            throw new Error('Event not found');
-        }
-        return updatedEvents[0];
+        const user = await db.query('SELECT user_id, username, email, firstName, lastName, dateOfBirth FROM users WHERE user_id = $1', [user_id]);
+        return user.rows[0] || null;
     } catch (error) {
-        console.error('Error updating event:', error);
-        throw new Error('Error updating event');
+        console.error("Error fetching user by id:", error);
+        throw new Error("Failed to get user by id");
     }
 };
+
+export const updateUserById = async (user_id, userData) => {
+    // Assume userData does not contain password. If updating password, hash it before.
+    try {
+        const fields = Object.keys(userData).map((field, index) => `${field} = $${index + 2}`).join(', ');
+        const values = Object.values(userData);
+        
+        const query = `UPDATE users SET ${fields} WHERE user_id = $1 RETURNING *`;
+        const result = await db.query(query, [user_id, ...values]);
+        
+        return { success: true, message: 'User updated successfully', user: result.rows[0] };
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return { success: false, message: 'Failed to update user', error: error.detail };
+    }
+};
+
+export const getUserDogsById = async (userId) => {
+    // This function assumes that there's a 'dogs' table related to the 'users' table.
+    try {
+        const dogs = await db.query('SELECT * FROM dogs WHERE user_id = $1', [userId]);
+        return dogs.rows;
+    } catch (error) {
+        console.error("Error fetching user's dogs:", error);
+        throw new Error("Failed to fetch user's dogs");
+    }
+};
+
+export const getUserEventsById = async (userId) => {
+    // This function assumes that there's an 'events' table related to the 'users' table.
+    try {
+        const events = await db.query('SELECT * FROM events WHERE user_id = $1', [userId]);
+        return events.rows;
+    } catch (error) {
+        console.error("Error fetching user's events:", error);
+        throw new Error("Failed to fetch user's events");
+    }
+};
+
+
+////////////////
+
+
+// last 
+
+
+// import { db } from '../config/db.js';
+
+// export const getAllEvents = async (filters) => {
+//     try {
+//         let query = db.select('*').from('events');
+//         if (filters) {
+//             // Применяем фильтры к запросу
+//             if (filters.title) {
+//                 query = query.where('title', 'ilike', `%${filters.title}%`);
+//             }
+//             if (filters.city) {
+//                 query = query.where('city', 'ilike', `%${filters.city}%`);
+//             }
+//             if (filters.date) {
+//                 query = query.where('date', filters.date);
+//             }
+//             if (filters.event_type) {
+//                 query = query.where('event_type', filters.event_type);
+//             }
+//             if (filters.day_of_week) {
+//                 query = query.where('days_of_week', filters.day_of_week);
+//             }
+//             // Добавьте дополнительные условия фильтрации по мере необходимости
+//         }
+//         const events = await query;
+//         return events;
+//     } catch (error) {
+//         console.error('Error fetching events:', error);
+//         throw new Error('Error fetching events');
+//     }
+// };
+
+// // Удаление события по идентификатору
+// export const deleteEvent = async (event_id) => {
+//     try {
+//         const deletedCount = await db('events').where({ event_id }).del();
+//         if (deletedCount === 0) {
+//             throw new Error('Event not found');
+//         }
+//         return deletedCount;
+//     } catch (error) {
+//         console.error('Error deleting event:', error);
+//         throw new Error('Error deleting event');
+//     }
+// };
+
+// // Добавление события
+// export const addEvent = async (title, description, date, location, volunteer_needed, event_type, days_of_week, user_id, dog_id) => {
+//     try {
+//         const [newEvent] = await db('events').insert({
+//             title,
+//             description,
+//             date,
+//             location,
+//             volunteer_needed,
+//             event_type,
+//             days_of_week,
+//             user_id,
+//             dog_id
+//         }).returning('*');
+//         return newEvent;
+//     } catch (error) {
+//         console.error('Error adding event:', error);
+//         throw new Error('Error adding event');
+//     }
+// };
+
+// // Получение события по идентификатору
+// export const getEventById = async (event_id) => {
+//     try {
+//         const event = await db.select('*').from('events').where({ event_id }).first();
+//         return event;
+//     } catch (error) {
+//         console.error('Error fetching event:', error);
+//         throw new Error('Error fetching event');
+//     }
+// };
+
+// // Обновление события по идентификатору
+// export const updateEvent = async (event_id, eventData) => {
+//     try {
+//         const updatedEvents = await db('events').where({ event_id }).update(eventData).returning('*');
+//         if (updatedEvents.length === 0) {
+//             throw new Error('Event not found');
+//         }
+//         return updatedEvents[0];
+//     } catch (error) {
+//         console.error('Error updating event:', error);
+//         throw new Error('Error updating event');
+//     }
+// };
 
 
 

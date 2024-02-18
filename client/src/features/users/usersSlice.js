@@ -11,15 +11,18 @@ const axiosInstance = axios.create({
     },
 });
 
-const getToken = (state) => state.auth.token;
+const getToken = (getState) => {
+    const { auth: { token } } = getState();
+    return token;
+};
 
 export const fetchUserById = createAsyncThunk(
     'users/fetchUserById',
-    async (userId, { getState, rejectWithValue }) => {
+    async ({ user_id }, { getState, rejectWithValue }) => { // Здесь объект с единственным свойством user_id
       const token = getToken(getState);
       if (!token) return rejectWithValue('Token not found');
       try {
-        const response = await axiosInstance.get(`/users/${userId}`, {
+        const response = await axiosInstance.get(`/users/${user_id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;
@@ -30,6 +33,7 @@ export const fetchUserById = createAsyncThunk(
       }
     }
 );
+
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { getState, rejectWithValue }) => {
     const token = getToken(getState);
@@ -44,18 +48,37 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { getSt
     }
 });
 
-export const updateUserById = createAsyncThunk('users/updateUserById', async ({ userId, userData }, { getState, rejectWithValue }) => {
-    const token = getToken(getState);
-    if (!token) return rejectWithValue('Token not found');
-    try {
-        const response = await axiosInstance.put(`/users/profile/${userId}`, userData, {
-            headers: { 'Authorization': `Bearer ${token}` },
+// export const updateUserById = createAsyncThunk('users/updateUserById', async ({ user_id, updateUserData }, { getState, rejectWithValue }) => {
+//     const token = getToken(getState);
+//     if (!token) return rejectWithValue('Token not found');
+//     try {
+//         const response = await axiosInstance.put(`/users/${user_id}`, updateUserData, {
+//             headers: { 'Authorization': `Bearer ${token}` },
+//         });
+//         return response.data;
+//     } catch (err) {
+//         return rejectWithValue(err.response.data);
+//     }
+// });
+
+export const updateUserById = createAsyncThunk(
+    'users/updateUserById',
+    async ({ user_id, updatedUserData }, { getState, rejectWithValue }) => {
+      const token = getToken(getState);
+      if (!token) return rejectWithValue('Token not found');
+  
+      try {
+        const response = await axiosInstance.put(`/users/${user_id}`, updatedUserData, {
+          headers: { 'Authorization': `Bearer ${token}` },
         });
         return response.data;
-    } catch (err) {
+      } catch (err) {
         return rejectWithValue(err.response.data);
+      }
     }
-});
+);
+
+  
 
 export const addDog = createAsyncThunk('users/addDog', async (dogData, { getState, rejectWithValue }) => {
     const token = getToken(getState);
@@ -106,11 +129,11 @@ export const fetchEvents = createAsyncThunk('users/fetchEvents', async (_, { get
 });
 
 export const fetchUserEvents = createAsyncThunk('users/fetchUserEvents',
-    async (userId, { getState, rejectWithValue }) => {
+    async (user_id, { getState, rejectWithValue }) => {
       const token = getToken(getState);
       if (!token) return rejectWithValue('Token not found');
       try {
-        const response = await axiosInstance.get(`/users/${userId}/events`, {
+        const response = await axiosInstance.get(`/users/${user_id}/events`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;

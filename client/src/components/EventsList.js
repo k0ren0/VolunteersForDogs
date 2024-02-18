@@ -1,99 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { useNavigate } from 'react-router-dom';
-// import { fetchUserEvents, deleteEvent, updateEvent } from '../features/events/eventsSlice';
-// import { fetchUserDogs } from '../features/dogs/dogsSlice';
-// import {
-//   TextField, Button, Typography, CircularProgress, Box, Table,
-//   TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, FormControl, InputLabel, Select, MenuItem
-// } from '@mui/material';
-// import { Edit as EditIcon, Delete as DeleteIcon, Save as SaveIcon } from '@mui/icons-material';
-
-// import moment from 'moment';
-
-// function EventsList() {
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate();
-//   const { token } = useSelector(state => state.auth);
-//   const { events, status, error, isEditing } = useSelector(state => state.events);
-//   const userDogs = useSelector(state => state.dogs.dogs);
-
-//   const [filter, setFilter] = useState({
-//     title: '',
-//     city: '',
-//     date: '',
-//     event_type: '',
-//     day_of_week: ''
-//   });
-
-//   const [loading, setLoading] = useState(false);
-
-//   useEffect(() => {
-//     if (token) {
-//       setLoading(true);
-//       dispatch(fetchUserEvents()).then(() => setLoading(false));
-//       dispatch(fetchUserDogs());
-//     } else {
-//       navigate('/login');
-//     }
-//   }, [dispatch, navigate, token]);
-
-//   const handleInputChange = (event) => {
-//     const { name, value } = event.target;
-//     setFilter(prev => ({ ...prev, [name]: value }));
-//   };
-
-//   // Не требует изменений, так как фильтрация будет происходить на клиенте
-//   const handleFilterEvents = () => {
-//     // Функция остается для сохранения интерфейса, но не выполняет запрос к серверу
-//   };
-
-//   // Прямо здесь реализуем фильтрацию
-//   const filteredEvents = events.filter(event => {
-//     return (!filter.title || event.title.toLowerCase().includes(filter.title.toLowerCase())) &&
-//            (!filter.city || event.city.toLowerCase().includes(filter.city.toLowerCase())) &&
-//            (!filter.date || moment(event.date).format('YYYY-MM-DD') === filter.date) &&
-//            (!filter.event_type || event.event_type === filter.event_type) &&
-//            (!filter.day_of_week || moment(event.date).format('dddd') === filter.day_of_week);
-//   });
-
-//   return (
-//     <Box sx={{ p: 2 }}>
-//       <Typography variant="h4" gutterBottom>Filter Events</Typography>
-//       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-//         {/* Форма фильтрации - без изменений */}
-//       </Box>
-
-//       {loading ? (
-//         <CircularProgress />
-//       ) : error ? (
-//         <Typography color="error">{`Error: ${error}`}</Typography>
-//       ) : (
-//         <TableContainer component={Paper}>
-//           <Table>
-//             <TableHead>
-//               {/* Заголовок таблицы - без изменений */}
-//             </TableHead>
-//             <TableBody>
-//               {filteredEvents.map((event) => (
-//                 <TableRow key={event.event_id}>
-//                   {/* Строки таблицы - без изменений */}
-//                 </TableRow>
-//               ))}
-//             </TableBody>
-//           </Table>
-//         </TableContainer>
-//       )}
-//     </Box>
-//   );
-// }
-
-// export default EventsList;
-
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -234,7 +138,7 @@ function EventsList() {
                     {moment(event.date).format('YYYY-MM-DD')}
                   </TableCell>
                   <TableCell>{event.event_type}</TableCell>
-                  <TableCell>{event.day_of_week}</TableCell>
+                  <TableCell>{event.days_of_week}</TableCell>
                   <TableCell>{userDogs && userDogs.some(dog => dog.user_id === event.user_id) ? userDogs.find(dog => dog.user_id === event.user_id).breed : '-'}</TableCell>
                   <TableCell>
                     {isEditing === event.event_id ? (
@@ -257,3 +161,94 @@ function EventsList() {
 export default EventsList;
 
 
+// import React, { useState, useEffect } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { useNavigate } from 'react-router-dom';
+// import { fetchUserEvents, deleteEvent, updateEvent } from '../features/events/eventsSlice';
+// import { fetchUserDogs } from '../features/dogs/dogsSlice';
+// import {
+//   TextField, Button, Typography, CircularProgress, Box, Table,
+//   TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, FormControl, InputLabel, Select, MenuItem
+// } from '@mui/material';
+// import { Edit as EditIcon, Delete as DeleteIcon, Save as SaveIcon } from '@mui/icons-material';
+
+// import moment from 'moment';
+
+// function EventsList() {
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+//   const { token } = useSelector(state => state.auth);
+//   const { events, status, error, isEditing } = useSelector(state => state.events);
+//   const userDogs = useSelector(state => state.dogs.dogs);
+
+//   const [filter, setFilter] = useState({
+//     title: '',
+//     city: '',
+//     date: '',
+//     event_type: '',
+//     day_of_week: ''
+//   });
+
+//   const [loading, setLoading] = useState(false);
+
+//   useEffect(() => {
+//     if (token) {
+//       setLoading(true);
+//       dispatch(fetchUserEvents()).then(() => setLoading(false));
+//       dispatch(fetchUserDogs());
+//     } else {
+//       navigate('/login');
+//     }
+//   }, [dispatch, navigate, token]);
+
+//   const handleInputChange = (event) => {
+//     const { name, value } = event.target;
+//     setFilter(prev => ({ ...prev, [name]: value }));
+//   };
+
+//   // Не требует изменений, так как фильтрация будет происходить на клиенте
+//   const handleFilterEvents = () => {
+//     // Функция остается для сохранения интерфейса, но не выполняет запрос к серверу
+//   };
+
+//   // Прямо здесь реализуем фильтрацию
+//   const filteredEvents = events.filter(event => {
+//     return (!filter.title || event.title.toLowerCase().includes(filter.title.toLowerCase())) &&
+//            (!filter.city || event.city.toLowerCase().includes(filter.city.toLowerCase())) &&
+//            (!filter.date || moment(event.date).format('YYYY-MM-DD') === filter.date) &&
+//            (!filter.event_type || event.event_type === filter.event_type) &&
+//            (!filter.day_of_week || moment(event.date).format('dddd') === filter.day_of_week);
+//   });
+
+//   return (
+//     <Box sx={{ p: 2 }}>
+//       <Typography variant="h4" gutterBottom>Filter Events</Typography>
+//       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+//         {/* Форма фильтрации - без изменений */}
+//       </Box>
+
+//       {loading ? (
+//         <CircularProgress />
+//       ) : error ? (
+//         <Typography color="error">{`Error: ${error}`}</Typography>
+//       ) : (
+//         <TableContainer component={Paper}>
+//           <Table>
+//             <TableHead>
+//               {/* Заголовок таблицы - без изменений */}
+//             </TableHead>
+//             <TableBody>
+//               {filteredEvents.map((event) => (
+//                 <TableRow key={event.event_id}>
+//                   {/* Строки таблицы - без изменений */}
+//                 </TableRow>
+//               ))}
+//             </TableBody>
+//           </Table>
+//         </TableContainer>
+//       )}
+//     </Box>
+//   );
+// }
+
+// export default EventsList;
