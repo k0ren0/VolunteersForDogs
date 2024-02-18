@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Typography, Container, Grid, Card, IconButton, Button } from '@mui/material'; //CardContent,
+import { Typography, Container, Grid, Card, IconButton, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled, keyframes } from '@mui/system';
 
-// Определения анимации и стилизованные компоненты
+// Definitions of animation and styled components
 const fadeIn = keyframes`
   from { opacity: 0; transform: 'translateY(20px)'; }
   to { opacity: 1; transform: 'translateY(0)'; }
@@ -24,13 +24,13 @@ const AnimatedImage = styled('img')({
 });
 
 const Home = () => {
-  // Использование useSelector для доступа к состоянию из Redux store
+  // Using useSelector to access state from the Redux store
   const { title, introduction, sections } = useSelector((state) => state.home);
   const { images } = useSelector((state) => state.gallery);
 
   return (
     <Container maxWidth="lg" sx={{ py: 8 }}>
-      {/* Заголовок и вступление */}
+      {/* Title and Introduction */}
       <Grid item xs={12}>
         <Typography variant="h3" gutterBottom align="center">{title}</Typography>
       </Grid>
@@ -38,7 +38,7 @@ const Home = () => {
         <Typography variant="body1" gutterBottom align="justify">{introduction}</Typography>
       </Grid>
 
-      {/* Отображение разделов с текстом */}
+      {/* Displaying sections with text */}
       {sections.map((section, index) => (
         <Grid container spacing={2} key={index}>
           <Grid item xs={12}>
@@ -48,20 +48,21 @@ const Home = () => {
         </Grid>
       ))}
 
-      {/* Галерея изображений */}
+      {/* Image Gallery */}
       <Typography variant="h4" gutterBottom align="center" sx={{ mt: 4 }}>Our Gallery</Typography>
       <Grid container spacing={4} justifyContent="center" alignItems="stretch">
         {images.map((image, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
             <AnimatedCard>
-              <AnimatedImage src={image} alt={`Image ${index}`} />
-              {/* Контент карточек может быть добавлен здесь, если необходимо */}
+              {/* Using images from Amazon S3 */}
+              <AnimatedImage src={`https://your-bucket-name.s3.amazonaws.com/${image}`} alt={`Image ${index}`} />
+              {/* Content of cards can be added here if needed */}
             </AnimatedCard>
           </Grid>
         ))}
       </Grid>
 
-      {/* Кнопка "Узнать больше" и плавающая кнопка меню */}
+      {/* "Learn More" Button and Floating Menu Button */}
       <Grid item xs={12} style={{ textAlign: 'center', marginTop: '20px' }}>
         <Button variant="contained" color="primary" size="large">Learn More</Button>
       </Grid>
@@ -76,6 +77,87 @@ const Home = () => {
 };
 
 export default Home;
+
+
+// import React from 'react';
+// import { useSelector } from 'react-redux';
+// import { Typography, Container, Grid, Card, IconButton, Button } from '@mui/material'; //CardContent,
+// import MenuIcon from '@mui/icons-material/Menu';
+// import { styled, keyframes } from '@mui/system';
+
+// // Definitions of animation and styled components
+// const fadeIn = keyframes`
+//   from { opacity: 0; transform: translateY(20px); }
+//   to { opacity: 1; transform: translateY(0); }
+// `;
+
+// const AnimatedCard = styled(Card)({
+//   animation: `${fadeIn} 0.5s ease-out`,
+// });
+
+// const AnimatedImage = styled('img')({
+//   width: '100%',
+//   height: 'auto',
+//   transition: 'transform 0.3s ease-in-out',
+//   '&:hover': {
+//     transform: 'scale(1.05)',
+//   },
+// });
+
+// const Home = () => {
+//   // Using useSelector to access state from Redux store
+//   const { title, introduction, sections } = useSelector((state) => state.home);
+//   const { images } = useSelector((state) => state.gallery);
+
+//   return (
+//     <Container maxWidth="lg" sx={{ py: 8 }}>
+//       {/* Title and Introduction */}
+//       <Grid item xs={12}>
+//         <Typography variant="h3" gutterBottom align="center">{title}</Typography>
+//       </Grid>
+//       <Grid item xs={12}>
+//         <Typography variant="body1" gutterBottom align="justify">{introduction}</Typography>
+//       </Grid>
+
+//       {/* Displaying sections with text */}
+//       {sections.map((section, index) => (
+//         <Grid container spacing={2} key={index}>
+//           <Grid item xs={12}>
+//             <Typography variant="h6" gutterBottom>{section.title}</Typography>
+//             <Typography variant="body1" gutterBottom align="justify">{section.content}</Typography>
+//           </Grid>
+//         </Grid>
+//       ))}
+
+//       {/* Image gallery */}
+//       <Typography variant="h4" gutterBottom align="center" sx={{ mt: 4 }}>Our Gallery</Typography>
+//       <Grid container spacing={4} justifyContent="center" alignItems="stretch">
+//         {images.map((image, index) => (
+//           <Grid item xs={12} sm={6} md={4} key={index}>
+//             <AnimatedCard>
+//               <AnimatedImage src={image} alt={`Image ${index}`} />
+//               {/* Card content can be added here if necessary */}
+//             </AnimatedCard>
+//           </Grid>
+//         ))}
+//       </Grid>
+
+//       {/* "Learn More" button and floating menu button */}
+//       <Grid item xs={12} style={{ textAlign: 'center', marginTop: '20px' }}>
+//         <Button variant="contained" color="primary" size="large">Learn More</Button>
+//       </Grid>
+//       <IconButton
+//         sx={{ position: 'fixed', bottom: 16, right: 16, bgcolor: 'primary.main', color: 'white' }}
+//         aria-label="menu"
+//       >
+//         <MenuIcon />
+//       </IconButton>
+//     </Container>
+//   );
+// };
+
+// export default Home;
+
 
 
 

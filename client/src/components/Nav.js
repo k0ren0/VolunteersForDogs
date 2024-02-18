@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
-import { AppBar, Toolbar, IconButton, Button, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Box, useMediaQuery, useTheme, Switch, styled } from '@mui/material';
+import {
+  AppBar, Toolbar, IconButton, Button, Typography, Drawer, List, ListItem,
+  ListItemButton, ListItemText, Box, useMediaQuery, useTheme, Switch, styled
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import PetsIcon from '@mui/icons-material/Pets';
 import { NavLink } from 'react-router-dom';
@@ -15,11 +18,11 @@ const CustomNavLink = styled(NavLink)(({ theme }) => ({
   },
   '&:hover': {
     filter: 'brightness(90%)',
-    transition: 'filter 0.3s ease', // Плавная трансформация при наведении
+    transition: 'filter 0.3s ease',
   },
   '&:active': {
     filter: 'brightness(80%)',
-    transition: 'filter 0.3s ease', // transformation
+    transition: 'filter 0.3s ease',
   },
 }));
 
@@ -62,8 +65,14 @@ const Nav = () => {
               <MenuIcon />
             </IconButton>
           )}
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            <PetsIcon sx={{ marginRight: 1 }} />
+          <Typography variant="h6" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              color="inherit"
+              onClick={toggleColorMode}
+              sx={{ marginRight: 1 }}
+            >
+              <PetsIcon />
+            </IconButton>
             Volunteer App
           </Typography>
           {!isMobile && links.filter(link => !link.hidden).map((link, index) => (
@@ -113,6 +122,124 @@ const Nav = () => {
 };
 
 export default Nav;
+
+
+
+// import React, { useState } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { logout } from '../features/auth/authSlice';
+// import { AppBar, Toolbar, IconButton, Button, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Box, useMediaQuery, useTheme, Switch, styled } from '@mui/material';
+// import MenuIcon from '@mui/icons-material/Menu';
+// import PetsIcon from '@mui/icons-material/Pets';
+// import { NavLink } from 'react-router-dom';
+// import { useThemeContext } from './themeContext';
+
+// const CustomNavLink = styled(NavLink)(({ theme }) => ({
+//   textDecoration: 'none',
+//   color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+//   '&.active': {
+//     fontWeight: 'bold',
+//   },
+//   '&:hover': {
+//     filter: 'brightness(90%)',
+//     transition: 'filter 0.3s ease', // Плавная трансформация при наведении
+//   },
+//   '&:active': {
+//     filter: 'brightness(80%)',
+//     transition: 'filter 0.3s ease', // transformation
+//   },
+// }));
+
+// const Nav = () => {
+//   const dispatch = useDispatch();
+//   const { token } = useSelector((state) => state.auth);
+//   const [drawerOpen, setDrawerOpen] = useState(false);
+//   const theme = useTheme();
+//   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+//   const { toggleColorMode } = useThemeContext();
+
+//   const handleLogoutClick = () => {
+//     dispatch(logout());
+//     setDrawerOpen(false);
+//   };
+
+//   const links = [
+//     { title: "Home", path: "/" },
+//     { title: "Login", path: "/login", hidden: token },
+//     { title: "Register", path: "/register", hidden: token },
+//     { title: "Profile", path: "/profile", hidden: !token },
+//     { title: "Events", path: "/events", hidden: !token },
+//     { title: "Logout", onClick: handleLogoutClick, hidden: !token },
+//   ];
+
+//   return (
+//     <>
+//       <AppBar position="static" sx={{
+//         backgroundImage: theme.palette.mode === 'dark' ? 'linear-gradient(to right, #333333, #283593)' : 'linear-gradient(to right, #64B5F6, #2196F3)',
+//         boxShadow: 'none',
+//       }}>
+//         <Toolbar>
+//           {isMobile && (
+//             <IconButton
+//               edge="start"
+//               color="inherit"
+//               aria-label="menu"
+//               onClick={() => setDrawerOpen(true)}
+//             >
+//               <MenuIcon />
+//             </IconButton>
+//           )}
+//           <Typography variant="h6" sx={{ flexGrow: 1 }}>
+//             <PetsIcon sx={{ marginRight: 1 }} />
+//             Volunteer App
+//           </Typography>
+//           {!isMobile && links.filter(link => !link.hidden).map((link, index) => (
+//             <Button
+//               key={index}
+//               color="inherit"
+//               component={CustomNavLink}
+//               to={link.path || ''}
+//               onClick={link.onClick}
+//             >
+//               {link.title}
+//             </Button>
+//           ))}
+//           <Switch
+//             checked={theme.palette.mode === 'dark'}
+//             onChange={toggleColorMode}
+//             sx={{
+//               '& .MuiSwitch-switchBase.Mui-checked': {
+//                 color: theme.palette.mode === 'dark' ? '#0D47A1' : '#2196F3',
+//               },
+//               '& .MuiSwitch-track': {
+//                 backgroundColor: theme.palette.mode === 'dark' ? '#757575' : '#d9d9d9',
+//               },
+//             }}
+//           />
+//         </Toolbar>
+//       </AppBar>
+//       <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+//         <Box
+//           sx={{ width: 250 }}
+//           role="presentation"
+//           onClick={() => setDrawerOpen(false)}
+//         >
+//           <List>
+//             {links.filter(link => !link.hidden).map((link, index) => (
+//               <ListItem key={index} disablePadding>
+//                 <ListItemButton component={CustomNavLink} to={link.path || ''} onClick={link.onClick}>
+//                   <ListItemText primary={link.title} />
+//                 </ListItemButton>
+//               </ListItem>
+//             ))}
+//           </List>
+//         </Box>
+//       </Drawer>
+//     </>
+//   );
+// };
+
+// export default Nav;
 
 
 

@@ -18,7 +18,7 @@ export const homeSlice = createSlice({
       },
       {
         title: "Working with Diverse Groups",
-        content: "Additionally, volunteering often involves working with various groups, including mobilized or conscripted dogs, and lone soldier repatriates who have returned to Israel to serve in the military."
+        content: "In addition, volunteering often involves working with dogs from various populations, including those mobilized or conscripted into the army, as well as lone repatriate soldiers who have returned to Israel for military service."
       }
     ]
   },
