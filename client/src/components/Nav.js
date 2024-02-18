@@ -86,7 +86,7 @@ const Nav = () => {
               {link.title}
             </Button>
           ))}
-          <Switch
+          {/* <Switch
             checked={theme.palette.mode === 'dark'}
             onChange={toggleColorMode}
             sx={{
@@ -97,7 +97,7 @@ const Nav = () => {
                 backgroundColor: theme.palette.mode === 'dark' ? '#757575' : '#d9d9d9',
               },
             }}
-          />
+          /> */}
         </Toolbar>
       </AppBar>
       <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
