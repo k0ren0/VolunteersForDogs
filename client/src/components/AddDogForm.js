@@ -39,7 +39,7 @@ const AddDogForm = ({ updateDogList }) => {
             setAge('');
             setOpenSnackbar(true);
 
-            // После успешного добавления обновляем список собак
+            // After add succees reload dogs
             if (updateDogList) updateDogList();
         } catch (error) {
             console.error('Error saving dog:', error);

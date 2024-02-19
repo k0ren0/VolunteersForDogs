@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator';
 import { db } from '../config/db.js';
 import moment from 'moment';
 
-// Добавление события
+
 export const _addEvent = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -13,7 +13,7 @@ export const _addEvent = async (req, res) => {
 
     try {
         const { title, description, date, location, volunteer_needed, event_type, days_of_week, dog_id } = req.body;
-        const user_id = req.user.user_id; // предполагается, что user_id добавляется в req через middleware аутентификации
+        const user_id = req.user.user_id; // user_id add to req by middleware auth
 
         const [newEvent] = await db('events').insert({
             user_id, title, description, date, location, volunteer_needed, event_type, days_of_week, dog_id
@@ -26,13 +26,13 @@ export const _addEvent = async (req, res) => {
     }
 };
 
-// Получение всех событий
+
 export const _getAllEvents = async (req, res) => {
     try {
         let query = db.select('*').from('events');
         const filters = req.query;
         if (filters) {
-            // Применяем фильтры к запросу
+            // filter req
             if (filters.title) {
                 query = query.where('title', 'ilike', `%${filters.title}%`);
             }
@@ -48,7 +48,7 @@ export const _getAllEvents = async (req, res) => {
             if (filters.day_of_week) {
                 query = query.where('days_of_week', filters.day_of_week);
             }
-            // Добавьте дополнительные условия фильтрации по мере необходимости
+           
         }
         const events = await query;
         res.json(events);
@@ -58,7 +58,7 @@ export const _getAllEvents = async (req, res) => {
     }
 };
 
-// Получение события по ID
+// Get event by ID
 export const _getEventById = async (req, res) => {
     const { event_id } = req.params;
     try {
@@ -73,7 +73,7 @@ export const _getEventById = async (req, res) => {
     }
 };
 
-// Обновление события
+// Update event
 export const _updateEvent = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -95,7 +95,7 @@ export const _updateEvent = async (req, res) => {
     }
 };
 
-// Удаление события
+// Del event
 export const _deleteEvent = async (req, res) => {
     const { event_id } = req.params;
 

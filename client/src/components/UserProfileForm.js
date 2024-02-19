@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, Grid, Container } from '@mui/material';
 
 const UserProfileForm = ({ user, onUpdate }) => {
-  // Состояния для полей формы
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
 
-  // useEffect для установки начальных значений формы
+  // useEffect for start form
   useEffect(() => {
     if (user) {
       setEmail(user.email || '');
@@ -20,7 +19,6 @@ const UserProfileForm = ({ user, onUpdate }) => {
     }
   }, [user]);
 
-  // Обработчик отправки формы
   const handleSubmit = (e) => {
     e.preventDefault();
     const updatedUserData = {

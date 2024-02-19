@@ -7,7 +7,7 @@ const ThemeContext = createContext();
 export const useThemeContext = () => useContext(ThemeContext);
 
 const CustomThemeProvider = ({ children }) => {
-  const [mode, setMode] = useState('light'); // Можно начать с 'dark', если нужна темная тема по умолчанию
+  const [mode, setMode] = useState('light'); // If need start by 'dark'
 
   const colorMode = React.useMemo(
     () => ({
@@ -24,23 +24,23 @@ const CustomThemeProvider = ({ children }) => {
         palette: {
           mode,
           primary: {
-            main: '#2962ff', // Измените основной цвет на ваш выбор
+            main: '#2962ff', // General color
           },
           ...(mode === 'dark' ? {
             background: {
-              default: '#263238', // Темно-серый фон в темной теме
-              paper: '#37474f', // Более темно-серый цвет для контента
+              default: '#263238', // Dark-gray in black theme
+              paper: '#37474f', // More than dark-grey color to content 
             },
             text: {
-              primary: '#ffffff', // Белый текст в темной теме
+              primary: '#ffffff', // White text in ligth theme
             },
           } : {
             background: {
-              default: '#f5f5f5', // Светло-серый фон в светлой теме
-              paper: '#ffffff', // Белый фон для контента
+              default: '#f5f5f5', // Ligth-gray in ligth theme 
+              paper: '#ffffff', // Whigt color in light thrmr
             },
             text: {
-              primary: '#000000', // Черный текст в светлой теме
+              primary: '#000000', // black text in light theme 
             },
           }),
         },

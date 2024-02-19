@@ -10,10 +10,10 @@ export const authenticateUser = createAsyncThunk(
         password,
       }, { withCredentials: true });
 
-      // Логируем весь ответ сервера для отладки
+    
       console.log('Authentication response:', response.data);
 
-      // Дополнительное логирование для уточнения структуры user, если он присутствует
+      // Adds logs
       if (response.data.user) {
         console.log('User data:', response.data.user);
       } else {
@@ -21,7 +21,7 @@ export const authenticateUser = createAsyncThunk(
       }
 
       const { token, user } = response.data;
-      // Логируем user_id, если он доступен
+      // Log user_id, if availeble 
       console.log('User ID:', user?.user_id);
 
       return { token, user, user_id: user?.user_id };
@@ -50,12 +50,12 @@ export const authSlice = createSlice({
   reducers: {
     login: (state, action) => {
       state.token = action.payload.token;
-      state.user_id = action.payload.user_id; // Сохраняем userId после успешной аутентификации
+      state.user_id = action.payload.user_id; // Save user_id
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
-      state.user_id = null; // Установите user_id в null при выходе
+      state.user_id = null; // set user_id to null at enter
       state.status = 'idle';
       state.error = null;
     },
@@ -70,9 +70,8 @@ export const authSlice = createSlice({
         state.status = 'succeeded';
         state.token = action.payload.token;
         state.user = action.payload.user;
-        state.user_id = action.payload.user_id; // Убедитесь, что user_id корректно обновляется
-        // Удалите console.log в production для безопасности
-        console.log('User authenticated with ID:', state.user_id);
+        state.user_id = action.payload.user_id;
+        console.log('User authenticated with ID:', state.user_id); //delete to secure
       })
       .addCase(authenticateUser.rejected, (state, action) => {
         state.status = 'failed';

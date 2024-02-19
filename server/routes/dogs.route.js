@@ -100,7 +100,7 @@ router.delete('/:dog_id', verifytoken, async (req, res) => {
     }
 });
 
-// Подтверждение токена (демонстрационный маршрут)
+// aprove token
 router.get("/api/verifytoken", verifytoken, (req, res) => {
     res.sendStatus(200);
 });

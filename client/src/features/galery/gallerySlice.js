@@ -7,11 +7,11 @@ export const gallerySlice = createSlice({
     images: [
       "volunteer_image_1.jpg",
       "volunteer_image_2.jpg",
-      // Добавьте пути к другим изображениям по мере необходимости
+      
     ]
   },
   reducers: {
-    // Добавление или удаление изображений при необходимости
+    // Del or add img 
     addImage: (state, action) => {
       state.images.push(action.payload);
     },

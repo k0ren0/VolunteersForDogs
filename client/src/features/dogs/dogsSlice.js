@@ -76,9 +76,9 @@ export const selectUserDogs = createSelector(
     (dogsState, authState) => {
         console.log('Dogs state:', dogsState);
         console.log('Auth state:', authState);
-        const user_id = authState ? authState.user_id : null; // Проверяем наличие объекта authState
+        const user_id = authState ? authState.user_id : null; // Check authState
         if (user_id && dogsState.dogs) {
-            // Фильтруем собак по user_id
+            // Filter dogs by user_id
             return dogsState.dogs.filter(dog => dog.user_id === user_id).map(dog => ({
                 dog_id: dog.dog_id,
                 name: dog.name,
@@ -105,10 +105,9 @@ const dogsSlice = createSlice({
             })
             .addCase(fetchUserDogs.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                // Прямо используем полученные данные о собаках для обновления состояния
                 state.dogs = action.payload.map(dog => ({
                     ...dog,
-                    breedInfo: { breed: dog.breed } // Имитация структуры данных для информации о породе
+                    breedInfo: { breed: dog.breed }
                 }));
             })
             

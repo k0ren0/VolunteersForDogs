@@ -14,7 +14,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import EditDogForm from './components/EditDogForm';
 import EditEventForm from './components/EditEventForm';
 import UserProfileForm from './components/UserProfileForm';
-import CustomThemeProvider from './components/themeContext'; // Импорт CustomThemeProvider
+import CustomThemeProvider from './components/themeContext'; 
 
 function App() {
   const { token } = useSelector((state) => state.auth);
@@ -27,8 +27,8 @@ function App() {
   };
 
   return (
-    <CustomThemeProvider> {/* Использование CustomThemeProvider */}
-      <CssBaseline /> {/* CssBaseline для обеспечения консистентности стилей */}
+    <CustomThemeProvider> 
+      <CssBaseline /> 
       <Nav />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -43,7 +43,6 @@ function App() {
         <Route path="/dogs/:id/edit" element={<ProtectedRoute><EditDogForm /></ProtectedRoute>} />
         <Route path="/addevent" element={<ProtectedRoute><AddEventForm /></ProtectedRoute>} />
         <Route path="/events/:event_id/edit" element={<ProtectedRoute><EditEventForm /></ProtectedRoute>} />
-        {/* Обработка неправильных маршрутов */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </CustomThemeProvider>

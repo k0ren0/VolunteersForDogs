@@ -41,10 +41,10 @@ function Events() {
 
   const handleFilterEvents = () => {
     if (token) {
-      // Создаем объект параметров фильтрации
+      // Make object of filter
       const filteredParams = {};
   
-      // Перебираем все свойства объекта filter и добавляем их в filteredParams, если они не пустые или неопределенные
+      // Check properties of filter, add to filteredParams, if null or undef...
       Object.entries(filter).forEach(([key, value]) => {
         if (value !== '' && value !== undefined) {
           filteredParams[key] = value;

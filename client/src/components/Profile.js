@@ -23,7 +23,7 @@ function Profile() {
 
   const handleUpdateById = (updatedUserData) => {
     dispatch(updateUserById({ user_id: user.user_id, updatedUserData: updatedUserData }));
-    // Добавлено логирование после обновления пользователя
+    // log after update
     console.log('User updated:', updatedUserData);
   };
 
@@ -46,7 +46,7 @@ function Profile() {
         {selectedTab === 0 && (
           loading ? <Typography>Loading user profile...</Typography> :
           error ? <Typography>Error loading profile. Please try again later.</Typography> :
-          <UserProfileForm user={user} onUpdate={handleUpdateById} /> // Передаем user и функцию onUpdate в UserProfileForm
+          <UserProfileForm user={user} onUpdate={handleUpdateById} /> // Check user and function onUpdate in UserProfileForm
         )}
 
         {selectedTab === 1 && (

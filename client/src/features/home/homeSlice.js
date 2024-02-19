@@ -5,8 +5,8 @@ import { createSlice } from '@reduxjs/toolkit';
 export const homeSlice = createSlice({
   name: 'home',
   initialState: {
-    title: "Welcome to Our Application!",
-    introduction: "Thank you for visiting our application. We are dedicated to making a positive impact in our community.",
+    title: "Welcome to our platform!",
+    introduction: "Thank you for visiting our platform. We are dedicated to making a positive impact in our community.",
     sections: [
       {
         title: "Volunteering in Israel",

@@ -4,17 +4,17 @@ import { store } from './app/store';
 import { BrowserRouter } from "react-router-dom";
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import ErrorBoundary from './ErrorBoundary'; // Импорт компонента ошибки
+import ErrorBoundary from './ErrorBoundary'; 
 
 const root = createRoot(document.getElementById('root'));
 root.render(
-  <ErrorBoundary> {/* Оборачиваем <App /> компонентом ошибки */}
+  <ErrorBoundary> 
     <Provider store={store}>
       <BrowserRouter>
         <App />
       </BrowserRouter>
     </Provider>
-  </ErrorBoundary>, // Здесь оборачиваем <App /> компонентом ошибки
+  </ErrorBoundary>, // app Error
 );
 
 reportWebVitals();

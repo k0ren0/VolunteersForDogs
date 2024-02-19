@@ -14,7 +14,7 @@ const Auth = ({ children }) => {
         return;
       }
       
-      axios.defaults.withCredentials = true; // Добавляем эту строку для установки withCredentials в true
+      axios.defaults.withCredentials = true; // SetwithCredentials to true
 
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/verifytoken`, {
@@ -25,7 +25,7 @@ const Auth = ({ children }) => {
 
         const { user } = response.data;
         console.log('User data:', user);
-        setUser(user); // Установка данных о пользователе в контекст аутентификации
+        setUser(user); // Set data about user
         
       } catch (error) {
         console.error("Verification failed:", error);
